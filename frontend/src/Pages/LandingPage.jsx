@@ -19,7 +19,7 @@ export default function LandingPage() {
         
         {/* Hero section */}
         <h2 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
-          Welcome to QuizNet 🎉
+          Ready to Quiz?
         </h2>
         <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-8">
           Sign up, create your first quiz, share with friends, and track live results in real-time.
