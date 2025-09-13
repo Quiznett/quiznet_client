@@ -1,18 +1,24 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./Pages/LandingPage";
-import Signup from "./Pages/Signup";
-import Login from "./Pages/Login"; // make sure this page exists
+//Author: Nishtha 
 
-import "./index.css";
+
+// Sets up client-side routing using react-router-dom.
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "./Pages/LandingPage"; // Home / landing page component
+import Signup from "./Pages/Signup";           // Signup form component
+import Login from "./Pages/Login";             // Login form component
+
+import "./index.css"; // Global styles
 
 function App() {
   return (
+    // BrowserRouter wraps the app to enable routing
     <BrowserRouter>
       <Routes>
-        {/* Landing Page */}
+        {/* Route for the landing page */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* Auth Pages */}
+        {/* Routes for authentication */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
       </Routes>
