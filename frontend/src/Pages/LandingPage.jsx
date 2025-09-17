@@ -1,44 +1,47 @@
-
 // Main landing page of the QuizNet application
-// Provides an overview of app features and navigation to signup
-// Includes Header and Footer components
+// This is the first page users see when they visit the app
+// It highlights features, explains what the app does, and guides users to sign up
 
-import { Link } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { Link } from "react-router-dom";   // Import Link for navigation without page refresh
+import Header from "../components/Header"; // Import Header (top navigation bar/logo etc.)
+import Footer from "../components/Footer"; // Import Footer (bottom section of the page)
 
+// React functional component -> LandingPage
 export default function LandingPage() {
   return (
+
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500">
       
-      {/* Header component */}
+      {/* Header is reused from components  has logo, nav, login/register buttons */}
       <Header />
 
-      {/* Main content */}
+      {/* Main content of landing page */}
       <main className="flex-grow flex flex-col items-center text-center px-6 py-12">
         
-        {/* Hero section */}
+        {/* Hero section = Big headline + intro text */}
         <h2 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
           Ready to Quiz?
         </h2>
+
+        {/* Short description → tells users what the app does */}
         <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-8">
           Sign up, create your first quiz, share with friends, and track live results in real-time.
         </p>
 
-        {/* Call-to-action button → navigates to Signup page */}
+        {/* Call-to-action button → redirects users to Signup page */}
         <Link
-          to="/signup"
+          to="/signup"  // when clicked → navigates to /signup route
           className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 transition"
         >
           Get Started
         </Link>
 
-        {/* Feature highlights section */}
+        {/* Features section → displays 3 key features in grid layout */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
           
-          {/* Create Quizzes */}
+          {/* Feature 1: Create Quizzes */}
           <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:scale-105 transition">
-            <span className="text-6xl">📝</span>
+            <span className="text-6xl">📝</span> {/* Emoji icon for quiz creation */}
             <h3 className="text-xl font-semibold mt-4 text-gray-800 dark:text-white">
               Create Quizzes
             </h3>
@@ -47,9 +50,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Share Easily */}
+          {/* Feature 2: Share Easily */}
           <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:scale-105 transition">
-            <span className="text-6xl">📢</span>
+            <span className="text-6xl">📢</span> {/* Emoji icon for sharing */}
             <h3 className="text-xl font-semibold mt-4 text-gray-800 dark:text-white">
               Share Easily
             </h3>
@@ -58,9 +61,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Track Results */}
+          {/* Feature 3: Track Results */}
           <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:scale-105 transition">
-            <span className="text-6xl">📈</span>
+            <span className="text-6xl">📈</span> {/* Emoji icon for analytics */}
             <h3 className="text-xl font-semibold mt-4 text-gray-800 dark:text-white">
               Track Results
             </h3>
@@ -71,7 +74,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Footer component */}
+      {/* Footer is reused from components */}
       <Footer />
     </div>
   );
