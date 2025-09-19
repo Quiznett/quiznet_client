@@ -38,6 +38,7 @@ export default function Login() {
       // Save token and username in localStorage for authentication persistence
       localStorage.setItem("token", response.data.access);
       localStorage.setItem("username", response.data.user.username);
+      localStorage.setItem("fullname", response.data.user.fullname);
 
       setLoginError("");      // Clear any previous error
       navigate("/welcome");   // Redirect user to welcome page
