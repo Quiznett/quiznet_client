@@ -1,13 +1,19 @@
-#quiznet_client
-#1. Clone the Repository
-##git clone https://github.com/Quiznett/quiznet_client.git
-##cd quiznet_client
+# quiznet_client
 
-#2. Go to frontend folder
-##cd frontend
+## Setup
+Follow these steps to set up the project locally.
 
-#3. Install Dependencies
-##npm install
-
-#4. Run Dev Server
-##npm run dev
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Quiznett/quiznet_client.git
+cd quiznet_client
+cd frontend
+```
+###  2. Install Dependencies
+```
+npm install
+```
+### 3. Run Dev Server
+```
+npm run dev
+```
