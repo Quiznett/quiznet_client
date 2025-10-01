@@ -1,11 +1,18 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+##  Tech Stack (Frontend)
 
-Currently, two official plugins are available:
+- **React 19** – UI library for building interactive components
+- **Vite 7** – Lightning-fast bundler & development server
+- **React Router v7** – Client-side routing & navigation
+- **Axios** – HTTP client for API requests
+- **React Hook Form** – Form handling & validation
+- **Tailwind CSS 3** – Utility-first CSS framework
+- **Lucide React** – Icon library for modern React apps
+- **Motion** – Animation library for smooth transitions
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+  
 
 
 
