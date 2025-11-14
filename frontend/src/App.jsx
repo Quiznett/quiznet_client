@@ -1,28 +1,34 @@
-// Author: Nishtha
-// App.jsx - Sets up client-side routing using react-router-dom
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Pages / Components
-import LandingPage from "./Pages/LandingPage"; // Home / landing page
-import Register from "./Pages/Register";        // Register form
-import Login from "./Pages/Login";             // Login form
-import Welcome from "./Pages/welcome";         //  welcome page
+import LandingPage from "./Pages/LandingPage";
+import Register from "./Pages/Register";
+import Login from "./Pages/Login";
+import Welcome from "./Pages/Welcome";
 
-import "./index.css"; // Global styles
+import CreateQuizForm from "./components/CreateQuizForm"; 
+import CreateQuiz from "./Pages/CreateQuiz";
+import MyQuizzes from "./Pages/myQuizzes";
+
+import "./index.css";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Landing / Home page */}
         <Route path="/" element={<LandingPage />} />
-
-        {/* Authentication routes */}
         <Route path="/signup" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
+        
         <Route path="/welcome" element={<Welcome />} />
+
+        {/* Create Quiz Pages */}
+        <Route path="/create-quiz-form" element={<CreateQuizForm />} />
+        <Route path="/create-quiz" element={<CreateQuiz />} />
+
+        {/* My Quizzes */}
+        <Route path="/myQuizzes" element={<MyQuizzes />} />
+
       </Routes>
     </BrowserRouter>
   );

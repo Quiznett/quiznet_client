@@ -4,7 +4,7 @@
 
 import { Link } from "react-router-dom";   // Import Link for navigation without page refresh
 import Header from "../components/Header"; // Import Header (top navigation bar/logo etc.)
-import Footer from "../components/Footer"; // Import Footer (bottom section of the page)
+
 
 // React functional component -> LandingPage
 export default function LandingPage() {
@@ -75,7 +75,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer is reused from components */}
-      <Footer />
+     
     </div>
   );
 }

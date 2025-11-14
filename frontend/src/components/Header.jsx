@@ -5,12 +5,11 @@ import { Link, useLocation } from "react-router-dom";
 export default function Header() {
   const location = useLocation();
 
-  // Initialize darkMode from localStorage or default to false
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
   );
 
-  // Apply dark class and save preference in localStorage
+ 
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -46,12 +45,8 @@ export default function Header() {
         >
           Contact
         </Link>
-        <Link
-          to="/events"
-          className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-        >
-          Events
-        </Link>
+        
+     
 
         {location.pathname === "/login" ? (
           <Link
