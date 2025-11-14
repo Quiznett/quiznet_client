@@ -4,8 +4,30 @@ import api from "../api/axios";
 export default function QuizCard({ quiz, fetchQuizzes, navigate }) {
   const [open, setOpen] = useState(false);
 
-  const totalQuestions = quiz.questions?.length || 0;
+  function formatLocalDateTime(utcString)
+  {
+    const date = new Date(utcString);
+    const localDate = date.toLocaleDateString([],
+      {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }
+    );
+    const localTime = date.toLocaleTimeString([],{
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    
+    return { localDate, localTime };
+  }
+
+  const totalQuestions = quiz.question_count || 0;
   const totalMarks = totalQuestions * quiz.marks_per_question;
+
+  const { localDate: startDate, localTime: startTime } = formatLocalDateTime(quiz.initiates_on);
+  const { localTime: endTime } = formatLocalDateTime(quiz.ends_on);
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this quiz?")) return;
@@ -54,8 +76,8 @@ export default function QuizCard({ quiz, fetchQuizzes, navigate }) {
 
       {open && (
         <div className="mt-4 text-sm space-y-1 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-          <p><strong>Date:</strong> {quiz.initiates_on.split("T")[0]}</p>
-          <p><strong>Time:</strong> {quiz.initiates_on.split("T")[1].slice(0,5)} - {quiz.ends_on.split("T")[1].slice(0,5)}</p>
+          <p><strong>Date:</strong> {startDate}</p>
+          <p><strong>Time:</strong> {startTime} - {endTime}</p>
           <p><strong>Total Questions:</strong> {totalQuestions}</p>
           <p><strong>Total Marks:</strong> {totalMarks}</p>
           <p><strong>Marks per Question:</strong> {quiz.marks_per_question}</p>
