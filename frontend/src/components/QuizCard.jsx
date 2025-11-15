@@ -42,18 +42,28 @@ export default function QuizCard({ quiz, fetchQuizzes, navigate }) {
     }
   };
 
-  const handlePublish = async () => {
-    try {
-      const token = sessionStorage.getItem("access");
-      await api.patch(
-        `http://127.0.0.1:8000/api/v1/quiz/publish/${quiz.quiz_id}/`,
-        { is_active: !quiz.is_active },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchQuizzes();
-    } catch (err) {
-      console.error("Publish error", err);
-    }
+  // const handlePublish = async () => {
+  //   try {
+  //     const token = sessionStorage.getItem("access");
+  //     await api.patch(
+  //       `http://127.0.0.1:8000/api/v1/quiz/publish/${quiz.quiz_id}/`,
+  //       { is_active: !quiz.is_active },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     fetchQuizzes();
+  //   } catch (err) {
+  //     console.error("Publish error", err);
+  //   }
+  // };
+
+  const handlePublish = () => {
+    const baseUrl = import.meta.env.VITE_FRONTEND_URL;
+
+    const link = `${baseUrl}/attempt/${quiz.quiz_id}`;
+
+    navigator.clipboard.writeText(link);
+
+    alert("Quiz link copied:\n" + link)
   };
 
   const handleEdit = () => {
