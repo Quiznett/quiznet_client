@@ -2,84 +2,63 @@ import { useState, useEffect } from "react";
 import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";
 import QuizCard from "../components/QuizCard";
-import api from "../api/axios";
+import CreateQuizForm from "../components/CreateQuizForm";  // ⭐ Required
 import { Loader2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../api/axios";
 
 export default function MyQuizzes() {
+  const { user, loading: authLoading } = useAuth();
+  const [openForm, setOpenForm] = useState(false);  // ⭐ Required
+
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true");
-  const [username, setUsername] = useState("");
-  const [fullname, setFullname] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
-
-  
-  useEffect(() => {
-    const user = sessionStorage.getItem("username");
-    const name = sessionStorage.getItem("fullname");
-    const token = sessionStorage.getItem("access");
-
-    
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-
-    if (user) {
-      setUsername(user);
-      setFullname(name || user);
-    }
-
-    fetchQuizzes();
-  }, []);
 
   const fetchQuizzes = async () => {
     try {
-      const token = sessionStorage.getItem("access");
-
-      
-      if (!token) {
-        console.warn("Token missing. Skipping quiz fetch.");
-        return;
-      }
-
-      const res = await api.get("http://127.0.0.1:8000/api/v1/quiz/create", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const res = await axiosInstance.get("/api/v1/quiz/create/");
       setQuizzes(res.data);
     } catch (err) {
-      console.error("Error fetching quizzes", err);
+      console.error("Error fetching quizzes:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) return;
+    fetchQuizzes();
+  }, [authLoading, user]);
+
+  if (authLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin" size={40} />
+      </div>
+    );
+
+  if (!user)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Please log in...</p>
+      </div>
+    );
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200 flex">
-      <Sidebar 
-        sidebarOpen={sidebarOpen} 
-        setSidebarOpen={setSidebarOpen} 
+
+      {/* Sidebar */}
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        openCreateForm={() => setOpenForm(true)}   // ⭐ Pass correct function
       />
 
+      {/* Main Content */}
       <div className="flex-1">
-        <HeaderUser
-          username={username}
-          fullname={fullname}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          getInitials={(name) =>
-            name.split(" ").map((n) => n[0]).join("").toUpperCase()
-          }
-        />
+        <HeaderUser username={user.username} fullname={user.fullname} />
 
         <div className="max-w-6xl mx-auto p-6">
           <h1 className="text-3xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">
@@ -91,7 +70,9 @@ export default function MyQuizzes() {
               <Loader2 className="animate-spin" size={40} />
             </div>
           ) : quizzes.length === 0 ? (
-            <p className="text-gray-500 text-center py-20">No quizzes created yet.</p>
+            <p className="text-gray-500 text-center py-20">
+              No quizzes created yet.
+            </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {quizzes.map((quiz) => (
@@ -101,6 +82,9 @@ export default function MyQuizzes() {
           )}
         </div>
       </div>
+
+      {/* ⭐ Add the modal here */}
+      {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
     </div>
   );
 }

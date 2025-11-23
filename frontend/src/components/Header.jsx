@@ -1,88 +1,52 @@
-import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Header() {
   const location = useLocation();
+  const { darkMode, setDarkMode } = useTheme();
 
-  const [darkMode, setDarkMode] = useState(
-    () => localStorage.getItem("darkMode") === "true"
-  );
-
- 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("darkMode", "true");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("darkMode", "false");
-    }
-  }, [darkMode]);
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
 
   return (
-    <header className="sticky top-0 z-50 flex justify-between items-center px-8 py-4 bg-white dark:bg-gray-900 shadow-md transition-colors duration-500">
-      <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-        QuizNet
-      </h1>
+    <header className="sticky top-0 z-50 flex justify-between items-center px-8 py-4 bg-white dark:bg-gray-900 shadow-md 
+        transition-colors duration-500">
+
+      <div className="flex items-center gap-2">
+        <img src="/favicon.ico" className="h-10 w-10" />
+        <span className="text-2xl font-bold text-indigo-600">QuizNet</span>
+      </div>
 
       <nav className="flex items-center space-x-6 text-lg">
+        
         <Link
           to="/"
           className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
         >
           Home
         </Link>
-        <Link
-          to="/about"
-          className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-        >
-          About
-        </Link>
-        <Link
-          to="/contact"
-          className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-        >
-          Contact
-        </Link>
-        
-     
 
-        {location.pathname === "/login" ? (
-          <Link
-            to="/signup"
-            className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-          >
-            Register
-          </Link>
-        ) : location.pathname === "/signup" ? (
+        
+        {!isLoginPage && (
           <Link
             to="/login"
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
           >
             Login
           </Link>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-            >
-              Register
-            </Link>
-          </>
         )}
 
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="ml-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition"
-        >
+        {!isRegisterPage && (
+          <Link
+            to="/register"
+            className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+          >
+            Register
+          </Link>
+        )}
+
+        <button onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? (
             <Sun className="w-5 h-5 text-yellow-400" />
           ) : (

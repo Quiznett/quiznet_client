@@ -7,10 +7,16 @@ import { StrictMode } from 'react';                // Enables additional checks 
 import { createRoot } from 'react-dom/client';    // React 18+ API to create root for rendering
 import './index.css';                              // Global styles
 import App from './App.jsx';                       // Main App component
+import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext";
 
 // Create a React root and render the App component inside <StrictMode>
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <AuthProvider>
+      <App />
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

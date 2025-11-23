@@ -1,68 +1,39 @@
 import { useState } from "react";
-import { Bell, Moon, Sun, LogOut, ChevronDown } from "lucide-react";
+import { Moon, Sun, LogOut, ChevronDown } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export default function HeaderUser({
-  username,
-  fullname,
-  darkMode: initialDarkMode = false,
-  setDarkMode: externalSetDarkMode,
-  handleLogout: externalLogout,
-  getInitials: externalGetInitials,
-}) {
+export default function HeaderUser({ username, fullname }) {
   const navigate = useNavigate();
+  const { logout } = useAuth();       // <-- FIXED (you forgot this)
+  const { darkMode, setDarkMode } = useTheme();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(initialDarkMode);
 
- const handleLogout =
-  externalLogout ||
-  (() => {
-    localStorage.removeItem("token");
-    navigate("/login"); // use your login route
-  });
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
-
-  const getInitials =
-    externalGetInitials ||
-    ((name) => {
-      if (!name) return "?";
-      const parts = name.split(" ");
-      return parts.map((p) => p[0].toUpperCase()).join("").slice(0, 2);
-    });
-
-  const toggleDarkMode = () => {
-    if (externalSetDarkMode) {
-      externalSetDarkMode((prev) => !prev);
-    } else {
-      setDarkMode((prev) => !prev);
-    }
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
     <header className="flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow-md relative">
-      {/* Left Side */}
-      <div className="flex items-center space-x-40">
-        <h1
-          onClick={() => navigate("/")}
-          className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer"
-        >
-          Quiznet
-        </h1>
-        <span className="text-gray-700 dark:text-gray-200 font-medium">
-          Welcome, {fullname}
-        </span>
+      <div className="flex items-center gap-2">
+        <img src="/favicon.ico" className="h-10 w-10" />
+        <span className="text-2xl font-bold text-indigo-600">QuizNet</span>
       </div>
 
-      {/* Right Side */}
       <div className="flex items-center space-x-4 relative">
-        <button className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition">
-          <Bell className="w-5 h-5 text-gray-800 dark:text-gray-200" />
-        </button>
-
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition"
-        >
+        {/* Theme Toggle */}
+        <button onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? (
             <Sun className="w-5 h-5 text-yellow-400" />
           ) : (
@@ -70,7 +41,7 @@ export default function HeaderUser({
           )}
         </button>
 
-        {/* Profile avatar */}
+        {/* Profile */}
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -87,12 +58,14 @@ export default function HeaderUser({
             />
           </button>
 
+          {/* Dropdown Menu */}
           {showProfileMenu && (
             <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-20">
               <div className="px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700">
                 <p className="font-semibold text-gray-900 dark:text-gray-100">{fullname}</p>
                 <p className="text-gray-500 dark:text-gray-400">{username}</p>
               </div>
+
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 w-full px-4 py-3 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 text-left text-sm font-medium transition"

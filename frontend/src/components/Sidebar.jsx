@@ -10,13 +10,13 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
-    { label: "Home", icon: Home, path: "/welcome" },
-    { label: "Create a Quiz", icon: PlusSquare, path: "/create-quiz-form" },
+    { label: "Home", icon: Home, path: "/user" },
+    { label: "Create a Quiz", icon: PlusSquare, action: "openForm" },
     { label: "Join Live Quiz", icon: LogIn, path: "/join-quiz" },
     { label: "My Quizzes", icon: ListChecks, path: "/myQuizzes" },
     { label: "Attempted Quizzes", icon: CheckCircle, path: "/given-quizzes" },
@@ -49,7 +49,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             return (
               <div
                 key={index}
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+                  if (item.action === "openForm") {
+                    openCreateForm();         // <-- Opens CreateQuizForm
+                  } else {
+                    navigate(item.path);
+                  }
+                }}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-all
                   ${
                     isActive && sidebarOpen

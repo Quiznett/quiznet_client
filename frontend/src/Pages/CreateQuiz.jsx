@@ -1,86 +1,44 @@
-import { useState, useEffect } from "react";
-import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
+
 import HeaderUser from "../components/HeaderUser";
-import api from "../api/axios"; 
+import { useAuth } from "../context/AuthContext";
+
+import axiosInstance from "../api/axios";
 
 export default function CreateQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🌙 Dark mode
-  const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true");
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
+  // Auth Context → User is already available
+  const { user } = useAuth();
 
-  // 👤 User info
-  const [username, setUsername] = useState("");
-  const [fullname, setFullname] = useState("");
+  
 
-  useEffect(() => {
-    
-    const token = sessionStorage.getItem("access");
-    const user = sessionStorage.getItem("username");
-    const name = sessionStorage.getItem("fullname");
+  // Receive quiz info from CreateQuizForm.jsx
+  const { quizTitle, date, startTime, endTime } = location.state || {};
 
-    if (token && user) {
-      setUsername(user);
-      setFullname(name || user);
-      return;
-    }
+  // If user directly opens /create-quiz with no state → redirect back
+  if (!quizTitle || !date || !startTime || !endTime) {
+    navigate(-1);
+  }
 
-   
-    const cookies = document.cookie.split("; ");
-    const userCookie = cookies.find((c) => c.startsWith("user="));
-    if (userCookie) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(userCookie.split("=")[1]));
-        setUsername(decoded.username);
-        setFullname(decoded.fullname);
-        sessionStorage.setItem("username", decoded.username);
-        sessionStorage.setItem("fullname", decoded.fullname);
-      } catch (err) {
-        console.error("Error decoding user cookie:", err);
-      }
-    } else {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  const handleLogout = async () => {
-    try {
-      await api.post("logout/");
-    } catch (e) {
-      console.error("Logout error:", e);
-    } finally {
-      sessionStorage.clear();
-      navigate("/login");
-    }
-  };
-
-  const getInitials = (name) =>
-    name ? name.split(" ").map((n) => n[0]).join("").toUpperCase() : "U";
-
-  const quizInfo = location.state || {};
-  const {
-    quizTitle: title = "Untitled Quiz",
-    date = "",
-    startTime = "",
-    endTime = "",
-    marksPerQuestion = 1,
-    totalQuestions = 0,
-  } = quizInfo;
-
+  // STATE: Questions
   const [questions, setQuestions] = useState([
     { question: "", options: ["", "", "", ""], correctOption: "1" },
   ]);
 
-  const addQuestion = () =>
-    setQuestions([...questions, { question: "", options: ["", "", "", ""], correctOption: "1" }]);
+  const addQuestion = () => {
+    setQuestions([
+      ...questions,
+      { question: "", options: ["", "", "", ""], correctOption: "1" },
+    ]);
+  };
 
-  const removeQuestion = (index) => setQuestions(questions.filter((_, i) => i !== index));
+  const removeQuestion = (index) => {
+    setQuestions(questions.filter((_, i) => i !== index));
+  };
 
   const handleQuestionChange = (index, value) => {
     const updated = [...questions];
@@ -100,36 +58,20 @@ export default function CreateQuiz() {
     setQuestions(updated);
   };
 
-
+  // CREATE QUIZ API CALL
   const handleSaveQuiz = async () => {
     try {
-      const token = sessionStorage.getItem("access");
-      if (!token) {
-        alert("❌ You are not logged in.");
-        navigate("/login");
-        return;
-      }
-
-      if (!date || !startTime || !endTime) {
-        alert("❌ Please select date, start time, and end time for the quiz.");
-        return;
-      }
-
       const start = new Date(`${date}T${startTime}:00`);
       const end = new Date(`${date}T${endTime}:00`);
       const timeLimit = Math.floor((end - start) / 60000);
-      if (timeLimit <= 0) {
-        alert(" End time must be after start time.");
-        return;
-      }
 
-      if (questions.length === 0) {
-        alert(" Please add at least one question.");
+      if (timeLimit <= 0) {
+        alert("End time must be after start time.");
         return;
       }
 
       const quizPayload = {
-        quiz_title: title || "Untitled Quiz",
+        quiz_title: quizTitle,
         initiates_on: start.toISOString(),
         ends_on: end.toISOString(),
         time_limit_minutes: timeLimit,
@@ -140,44 +82,26 @@ export default function CreateQuiz() {
           option2: q.options[1] || "Option 2",
           option3: q.options[2] || "Option 3",
           option4: q.options[3] || "Option 4",
-          answer:
-            parseInt(q.correctOption) >= 1 && parseInt(q.correctOption) <= 4
-              ? parseInt(q.correctOption)
-              : 1,
+          answer: parseInt(q.correctOption),
         })),
       };
 
-      await api.post("http://127.0.0.1:8000/api/v1/quiz/create/", quizPayload, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axiosInstance.post(`/api/v1/quiz/create/`, quizPayload);
 
-      
-      navigate("/myQuizzes"); 
-    } catch (error) {
-      console.error("Error creating quiz:", error.response || error);
-      alert("❌ Failed to create quiz.");
+      navigate("/myQuizzes");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create quiz.");
     }
   };
 
-  const totalMarks = questions.length * marksPerQuestion;
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-200 transition-colors duration-500">
-      <HeaderUser
-        username={username}
-        fullname={fullname}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        handleLogout={handleLogout}
-        getInitials={getInitials}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
+      {/* Header */}
+      <HeaderUser username={user.username} fullname={user.fullname} />
 
       <div className="max-w-7xl mx-auto py-8 px-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* LEFT SIDE: CREATE QUESTIONS */}
+        {/* LEFT SIDE: Questions Builder */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -187,6 +111,7 @@ export default function CreateQuiz() {
               >
                 <ArrowLeft size={22} />
               </button>
+
               <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                 Create Questions
               </h1>
@@ -222,8 +147,10 @@ export default function CreateQuiz() {
                 <input
                   type="text"
                   value={q.question}
-                  onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
-                  placeholder="Type question..."
+                  onChange={(e) =>
+                    handleQuestionChange(qIndex, e.target.value)
+                  }
+                  placeholder="Type your question..."
                   className="w-full mb-4 p-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
 
@@ -232,7 +159,9 @@ export default function CreateQuiz() {
                     <input
                       type="text"
                       value={opt}
-                      onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                      onChange={(e) =>
+                        handleOptionChange(qIndex, oIndex, e.target.value)
+                      }
                       placeholder={`Option ${oIndex + 1}`}
                       className="flex-grow p-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:ring-1 focus:ring-indigo-400 outline-none"
                     />
@@ -245,7 +174,9 @@ export default function CreateQuiz() {
                   </label>
                   <select
                     value={q.correctOption}
-                    onChange={(e) => handleCorrectOptionChange(qIndex, e.target.value)}
+                    onChange={(e) =>
+                      handleCorrectOptionChange(qIndex, e.target.value)
+                    }
                     className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none"
                   >
                     <option value="1">{q.options[0] || "Option 1"}</option>
@@ -261,57 +192,53 @@ export default function CreateQuiz() {
           <div className="mt-8 flex justify-center">
             <button
               onClick={addQuestion}
-              disabled={totalQuestions && questions.length >= totalQuestions}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl shadow-md transition-all ${
-                totalQuestions && questions.length >= totalQuestions
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700 text-white hover:scale-105"
-              }`}
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-md hover:scale-105 transition-all"
             >
               <Plus size={20} /> Add Question
             </button>
           </div>
         </div>
 
-        {/* RIGHT SIDE: PREVIEW */}
+        {/* RIGHT SIDE: Preview */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
             🧾 Quiz Preview
           </h2>
 
-          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+          <h3 className="text-xl font-semibold mb-2">{quizTitle}</h3>
           <p className="text-gray-500 mb-6">
-            Date: {date} | Time: {startTime} - {endTime} <br />
+            Date: {date} | Time: {startTime} — {endTime}
+            <br />
             Total Questions: {questions.length}
-            {totalQuestions ? ` / ${totalQuestions}` : ""} | Total Marks: {totalMarks}
           </p>
 
-          {questions.length > 0 ? (
-            questions.map((q, qIndex) => (
-              <div key={qIndex} className="mb-6">
-                <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-                  Q{qIndex + 1}.{" "}
-                  {q.question || <span className="text-gray-500 italic">No question text</span>}
-                </h4>
-                <ul className="space-y-2">
-                  {q.options.map((opt, oIndex) => (
-                    <li
-                      key={oIndex}
-                      className={`p-2 rounded-md ${
-                        parseInt(q.correctOption) === oIndex + 1
-                          ? "bg-green-100 dark:bg-green-900/40"
-                          : "bg-gray-100 dark:bg-gray-700"
-                      }`}
-                    >
-                      {opt || <span className="text-gray-400 italic">Empty option</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500 italic">No questions added yet.</p>
-          )}
+          {questions.map((q, qIndex) => (
+            <div key={qIndex} className="mb-6">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
+                Q{qIndex + 1}.{" "}
+                {q.question || (
+                  <span className="text-gray-500 italic">No question text</span>
+                )}
+              </h4>
+
+              <ul className="space-y-2">
+                {q.options.map((opt, oIndex) => (
+                  <li
+                    key={oIndex}
+                    className={`p-2 rounded-md ${
+                      parseInt(q.correctOption) === oIndex + 1
+                        ? "bg-green-100 dark:bg-green-900/40"
+                        : "bg-gray-100 dark:bg-gray-700"
+                    }`}
+                  >
+                    {opt || (
+                      <span className="text-gray-400 italic">Empty option</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </div>
