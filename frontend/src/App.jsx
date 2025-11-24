@@ -5,10 +5,12 @@ import Register from "./Pages/Register";
 import Login from "./Pages/Login";
 import User from "./Pages/User";
 import CreateQuiz from "./Pages/CreateQuiz";
-import MyQuizzes from "./Pages/MyQuizzes";
+import MyQuizzes from "./Pages/myQuizzes";
 
 import JoinQuiz from "./Pages/JoinQuiz";
 import Instructions from "./Pages/Instructions";
+import AttemptQuiz from "./Pages/AttemptQuiz";
+import Result from "./Pages/Result";
 
 
 import "./index.css";
@@ -25,6 +27,9 @@ function App() {
         <Route path="/myQuizzes" element={<MyQuizzes />} />
         <Route path="/join-quiz" element={<JoinQuiz />} />
         <Route path="/instructions/:quizId" element={<Instructions />} />
+
+        <Route path="/attempt/:quizId" element={<AttemptQuiz />} />
+        <Route path="/result/:quizId" element={<Result />} />
       </Routes>
     </BrowserRouter>
   );

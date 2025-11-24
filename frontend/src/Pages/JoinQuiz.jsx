@@ -1,22 +1,20 @@
-// src/Pages/JoinQuiz.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import axios from "../api/axios";
-
 import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
+
+import CreateQuizForm from "../components/CreateQuizForm";
 
 export default function JoinQuiz() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openForm, setOpenForm] = useState(false);   
   const [link, setLink] = useState("");
   const [error, setError] = useState("");
 
-  // Extract quiz id (your exact logic)
   const extractQuizId = (value) => {
     if (!value) return null;
     const trimmed = value.trim();
@@ -32,37 +30,31 @@ export default function JoinQuiz() {
     const parts = trimmed.split("/").filter(Boolean);
     return parts[parts.length - 1] || null;
   };
-const handleJoin = async (e) => {
-  e.preventDefault();
-  setError("");
 
-  const quizId = extractQuizId(link);
-  if (!quizId) {
-    setError("Invalid link. Could not extract quiz ID.");
-    return;
-  }
+  const handleJoin = (e) => {
+    e.preventDefault();
+    setError("");
 
-  try {
-    // 🔍 Check backend before navigating
-    await axios.get(`/api/v1/quiz/attempt/${quizId}/`);
+    const quizId = extractQuizId(link);
+    if (!quizId) {
+      setError("Invalid link. Could not extract quiz ID.");
+      return;
+    }
 
     navigate(`/instructions/${quizId}`);
-  } catch (err) {
-    const msg = err.response?.data?.detail || "Quiz not found.";
-    setError(msg);
-  }
-};
-
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
       <HeaderUser username={user?.username} fullname={user?.fullname} />
 
       <main className="relative flex flex-grow">
+
         {/* Sidebar */}
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
+          openCreateForm={() => setOpenForm(true)}    
         />
 
         {/* Center content */}
@@ -85,9 +77,7 @@ const handleJoin = async (e) => {
                            focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
 
-              {error && (
-                <p className="text-red-600 text-sm text-center">{error}</p>
-              )}
+              {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
               <div className="flex items-center justify-center gap-4 pt-2">
                 <button
@@ -108,6 +98,10 @@ const handleJoin = async (e) => {
             </form>
           </div>
         </section>
+
+      
+        {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+
       </main>
     </div>
   );

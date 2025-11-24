@@ -11,15 +11,15 @@ export default function CreateQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Auth Context → User is already available
+
   const { user } = useAuth();
 
   
 
-  // Receive quiz info from CreateQuizForm.jsx
+  
   const { quizTitle, date, startTime, endTime } = location.state || {};
 
-  // If user directly opens /create-quiz with no state → redirect back
+
   if (!quizTitle || !date || !startTime || !endTime) {
     navigate(-1);
   }

@@ -15,7 +15,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto-refresh on 401
+
 axiosInstance.interceptors.response.use(
   (res) => res,
   async (error) => {

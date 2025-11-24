@@ -1,10 +1,10 @@
 import api from "./axios";
 
-export const saveAnswer = async (quizId, questionId, response) => {
+export const saveAnswer = async (quizId, questionId, selectedOption) => {
   try {
     const res = await api.patch(`/api/v1/quiz/attempt/${quizId}/save/`, {
       question_id: questionId,
-      response,
+      selected_option: selectedOption,   
     });
     return res.data;
   } catch (error) {

@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // run on app load → try refreshing access token
   useEffect(() => {
     const init = async () => {
       try {
@@ -27,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         const access = res.data.access;
         if (access) localStorage.setItem("access", access);
 
-        // Read user cookie (URL encoded)
+        
         const userCookie = document.cookie
           .split("; ")
           .find((row) => row.startsWith("user="));

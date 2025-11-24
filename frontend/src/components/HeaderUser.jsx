@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function HeaderUser({ username, fullname }) {
   const navigate = useNavigate();
-  const { logout } = useAuth();       // <-- FIXED (you forgot this)
+  const { logout } = useAuth();       
   const { darkMode, setDarkMode } = useTheme();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
