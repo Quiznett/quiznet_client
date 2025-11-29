@@ -20,7 +20,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
     { label: "Join Live Quiz", icon: LogIn, path: "/join-quiz" },
     { label: "My Quizzes", icon: ListChecks, path: "/myQuizzes" },
     { label: "Attempted Quizzes", icon: CheckCircle, path: "/given-quizzes" },
-    { label: "My Performance", icon: BarChart2, path: "/performance" },
+    { label: "Quiz Response", icon: BarChart2, path: "/quiz-response" },
   ];
 
   return (
@@ -51,7 +51,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
                 key={index}
                 onClick={() => {
                   if (item.action === "openForm") {
-                    openCreateForm();         // <-- Opens CreateQuizForm
+                    openCreateForm();         
                   } else {
                     navigate(item.path);
                   }

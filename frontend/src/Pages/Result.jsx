@@ -4,68 +4,147 @@ import HeaderUser from "../components/HeaderUser";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import CreateQuizForm from "../components/CreateQuizForm";
+import axiosInstance from "../api/axios";
+import AttemptedResponseSheet from "../components/AttemptedResponseSheet";
 
 export default function ResultPage() {
   const { quizId } = useParams();
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [openForm, setOpenForm] = useState(false);   
+  const [openForm, setOpenForm] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const { user } = useAuth();
-  const [score, setScore] = useState(null);
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
-    const sc = localStorage.getItem("quiz_score");
-    if (!sc) {
-      alert("No result found.");
-      return navigate("/user");
+    async function fetchResult() {
+      try {
+        // GET USER'S RESPONSE SHEET
+        const respRes = await axiosInstance.get(
+          `/api/v1/quiz/quizzes/${quizId}/responses/`
+        );
+
+        let data = respRes.data;
+
+        // Case 1: Array (creator sees all → student must pick themselves)
+        let resultData = null;
+
+        if (Array.isArray(data)) {
+          resultData = data.find(
+            (a) => String(a.user_id) === String(user.id)
+          );
+        }
+        // Case 2: Single object → student sees their own
+        else {
+          resultData = data;
+        }
+
+        if (!resultData) {
+          alert("No result found");
+          navigate("/user");
+          return;
+        }
+
+   
+        setResult(resultData);
+      } catch (err) {
+        console.error("RESULT ERROR:", err);
+        alert("Could not fetch result");
+      }
     }
-    setScore(sc);
-  }, [navigate]);
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
-      <HeaderUser username={user.username} fullname={user.fullname} />
+    fetchResult();
+  }, [quizId, user.id, navigate]);
 
-      <main className="relative flex flex-grow">
+  if (!result)
+    return <div className="text-center p-8 text-gray-600">Loading...</div>;
 
-        {/* Sidebar */}
-        <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          openCreateForm={() => setOpenForm(true)}    
-        />
+  // Stats
+  const total = result.responses.length;
+  const correct = result.responses.filter((r) => r.is_correct).length;
+  const wrong = result.responses.filter(
+    (r) => !r.is_correct && r.selected_option !== null
+  ).length;
+  const left = result.responses.filter((r) => r.selected_option === null).length;
 
-        {/* Main Content */}
-        <section className="flex-grow p-6 flex justify-center">
-          <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+ return (
+  <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <HeaderUser username={user.username} fullname={user.fullname} />
 
-            <h1 className="text-3xl font-bold text-center mb-6 dark:text-white">
-              Quiz Result
-            </h1>
+    <main className="relative flex flex-grow">
 
-            <div className="p-6 bg-blue-100 dark:bg-blue-900 rounded-xl text-center">
-              <p className="text-5xl font-bold dark:text-white">{score}</p>
-              <p className="text-gray-600 dark:text-gray-300">Your Score</p>
-            </div>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        openCreateForm={() => setOpenForm(true)}
+      />
 
-            <div className="text-center mt-8">
-              <button
-                onClick={() => navigate("/user")}
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
-              >
-                Back to Dashboard
-              </button>
-            </div>
+      <section className="flex-grow p-6 overflow-auto flex justify-center">
+        <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
 
+          <h1 className="text-3xl font-bold text-center mb-6 dark:text-white">
+            Quiz Result
+          </h1>
+
+          {/* Score */}
+          <div className="p-6 bg-blue-100 dark:bg-blue-900 rounded-xl text-center mb-8">
+            <p className="text-5xl font-bold dark:text-white">{result.score}</p>
+            <p className="text-gray-600 dark:text-gray-300">Your Score</p>
           </div>
-        </section>
 
-        
-        {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-6 text-center mb-8">
+            <div className="p-4 bg-green-100 dark:bg-green-900 rounded-xl">
+              <p className="text-xl font-bold dark:text-white">{correct}</p>
+              <p>Correct</p>
+            </div>
 
-      </main>
-    </div>
-  );
+            <div className="p-4 bg-red-100 dark:bg-red-900 rounded-xl">
+              <p className="text-xl font-bold dark:text-white">{wrong}</p>
+              <p>Wrong</p>
+            </div>
+
+            <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-xl">
+              <p className="text-xl font-bold dark:text-white">{left}</p>
+              <p>Unanswered</p>
+            </div>
+
+            <div className="p-4 bg-gray-200 dark:bg-gray-700 rounded-xl">
+              <p className="text-xl font-bold dark:text-white">{total}</p>
+              <p>Total Questions</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={() => setOpenModal(true)}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
+            >
+              View Answer Sheet
+            </button>
+          </div>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => navigate("/user")}
+              className="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg shadow"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+      {openModal && (
+       <AttemptedResponseSheet attempt={{ attempt: result }} onClose={() => setOpenModal(false)} />
+
+      )}
+
+    </main>
+  </div>
+);
+
 }

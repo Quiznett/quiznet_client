@@ -117,78 +117,84 @@ export default function Instructions() {
   const startAttempt = () => navigate(`/attempt/${quizId}`);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HeaderUser username={user.username} fullname={user.fullname} />
+  <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <HeaderUser username={user.username} fullname={user.fullname} />
 
-      <main className="relative flex flex-grow">
-        <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          openCreateForm={() => setOpenForm(true)}     
-        />
+    <main className="relative flex flex-grow">
 
-        <section className="flex-grow flex items-center justify-center p-6">
-          <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10">
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        openCreateForm={() => setOpenForm(true)}
+      />
 
-            <h1 className="text-3xl font-extrabold mb-6 text-center dark:text-white">
-              {title}
-            </h1>
+      <section className="flex-grow p-6 overflow-auto flex justify-center">
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10">
 
-            {quizNotStarted && (
-              <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-4 rounded-xl mb-6 text-center">
-                <h2 className="text-xl font-bold mb-2">🚫 Quiz Not Started Yet</h2>
-                <p>This quiz is scheduled to start at:</p>
-                <p className="text-lg font-semibold mt-1">
-                  {startTime.toLocaleString()}
-                </p>
-              </div>
-            )}
+          <h1 className="text-3xl font-extrabold mb-6 text-center dark:text-white">
+            {title}
+          </h1>
 
-            <div className="bg-gray-100 dark:bg-gray-700 p-5 rounded-xl mb-8 shadow-inner">
-              <p className="text-lg"><strong>Total Questions:</strong> {questionsCount}</p>
-              <p className="text-lg"><strong>Duration:</strong> {duration} minutes</p>
+          {quizNotStarted && (
+            <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-4 rounded-xl mb-6 text-center">
+              <h2 className="text-xl font-bold mb-2">🚫 Quiz Not Started Yet</h2>
+              <p>This quiz is scheduled for:</p>
+              <p className="text-lg font-semibold mt-1">
+                {startTime.toLocaleString()}
+              </p>
             </div>
+          )}
 
-            <div className="space-y-4 text-gray-700 dark:text-gray-300">
-              <h2 className="text-xl font-semibold dark:text-white">
-                Please read the instructions carefully:
-              </h2>
-
-              <ul className="list-disc pl-6 space-y-3 text-sm leading-relaxed">
-                <li>Timer starts when you click Start Attempt.</li>
-                <li>The timer cannot be paused.</li>
-                <li>Quiz auto-submits when time ends.</li>
-                <li>Do NOT refresh or close the browser.</li>
-                <li>Ensure a stable internet connection.</li>
-              </ul>
-            </div>
-
-            <div className="flex items-center justify-center gap-4 pt-8">
-              <button
-                onClick={startAttempt}
-                disabled={quizNotStarted}
-                className={`px-8 py-3 rounded-xl shadow-md text-lg
-                  ${quizNotStarted
-                      ? "bg-gray-400 cursor-not-allowed text-white"
-                      : "bg-green-600 hover:bg-green-700 text-white"
-                  }`}
-              >
-                Start Attempt
-              </button>
-
-              <button
-                onClick={() => navigate(-1)}
-                className="px-8 py-3 border rounded-xl dark:border-gray-600 dark:text-gray-200 text-lg"
-              >
-                Back
-              </button>
-            </div>
-
+          <div className="bg-gray-100 dark:bg-gray-700 p-5 rounded-xl mb-8 shadow-inner">
+            <p className="text-lg">
+              <strong >Total Questions:</strong> {questionsCount}
+            </p>
+            <p className="text-lg">
+              <strong>Duration:</strong> {duration} minutes
+            </p>
           </div>
-        </section>
 
-        {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
-      </main>
-    </div>
-  );
+          <div className="space-y-4 text-gray-700 dark:text-gray-300">
+            <h2 className="text-xl font-semibold dark:text-white">
+              Please read the instructions carefully:
+            </h2>
+            <ul className="list-disc pl-6 space-y-3 text-sm leading-relaxed">
+              <li>Timer starts when you click Start Attempt.</li>
+              <li>You cannot pause the timer.</li>
+              <li>Auto-submission when time runs out.</li>
+              <li>Do NOT close tab of the quiz screen.</li>
+              <li>Ensure proper internet connection.</li>
+            </ul>
+          </div>
+
+          <div className="flex items-center justify-center gap-4 pt-8">
+            <button
+              onClick={startAttempt}
+              disabled={quizNotStarted}
+              className={`px-8 py-3 rounded-xl shadow-md text-lg
+              ${
+                quizNotStarted
+                  ? "bg-gray-400 cursor-not-allowed text-white"
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
+            >
+              Start Attempt
+            </button>
+
+            <button
+              onClick={() => navigate(-1)}
+              className="px-8 py-3 border rounded-xl dark:border-gray-600 dark:text-gray-200 text-lg"
+            >
+              Back
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+    </main>
+  </div>
+);
+
 }

@@ -17,7 +17,7 @@ export default function CreateQuiz() {
   
 
   
-  const { quizTitle, date, startTime, endTime } = location.state || {};
+  const { quizTitle, date, startTime, endTime,timeLimit } = location.state || {};
 
 
   if (!quizTitle || !date || !startTime || !endTime) {
@@ -63,7 +63,7 @@ export default function CreateQuiz() {
     try {
       const start = new Date(`${date}T${startTime}:00`);
       const end = new Date(`${date}T${endTime}:00`);
-      const timeLimit = Math.floor((end - start) / 60000);
+      
 
       if (timeLimit <= 0) {
         alert("End time must be after start time.");

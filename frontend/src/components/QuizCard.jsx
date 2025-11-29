@@ -72,7 +72,7 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
         </h2>
 
         <button
-          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
+          className="px-3 py-1 bg-gray-200 dark:bg-gray-400 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
           onClick={() => setOpen(!open)}
         >
           Details
@@ -80,10 +80,30 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
       </div>
 
       {open && (
-        <div className="mt-4 text-sm space-y-1 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-          <p><strong>Date:</strong> {startDate}</p>
-          <p><strong>Time:</strong> {startTime} - {endTime}</p>
-          <p><strong>Total Questions:</strong> {totalQuestions}</p>
+        <div
+          className="
+            mt-4 text-sm space-y-1 
+            bg-gray-100 dark:bg-gray-700 
+            p-4 rounded-lg
+            text-gray-900 dark:text-gray-100
+          "
+        >
+          <p>
+            <strong className="text-gray-900 dark:text-gray-200">Date:</strong>{" "}
+            {startDate}
+          </p>
+
+          <p>
+            <strong className="text-gray-900 dark:text-gray-200">Time:</strong>{" "}
+            {startTime} - {endTime}
+          </p>
+
+          <p>
+            <strong className="text-gray-900 dark:text-gray-200">
+              Total Questions:
+            </strong>{" "}
+            {totalQuestions}
+          </p>
         </div>
       )}
 
@@ -110,13 +130,6 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
       )}
 
       <div className="flex items-center gap-3 mt-5">
-        <button
-          onClick={handleEdit}
-          className="px-4 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Edit
-        </button>
-
         <button
           onClick={handleDelete}
           className="px-4 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700"

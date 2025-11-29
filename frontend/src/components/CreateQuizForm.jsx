@@ -8,6 +8,8 @@ export default function CreateQuizForm({ closeForm }) {
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [timeLimit, setTimeLimit] = useState("");
+
 
   const modalRef = useRef(null);
 
@@ -25,6 +27,14 @@ export default function CreateQuizForm({ closeForm }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const start = new Date(`${date}T${startTime}`);
+  const end = new Date(`${date}T${endTime}`);
+
+  if (end <= start) {
+    alert("End time must be AFTER start time.");
+    return; 
+  }
+
 
     
     closeForm();
@@ -36,6 +46,7 @@ export default function CreateQuizForm({ closeForm }) {
         date,
         startTime,
         endTime,
+         timeLimit,
       },
     });
   };
@@ -103,6 +114,19 @@ export default function CreateQuizForm({ closeForm }) {
               required
             />
           </div>
+          <div>
+  <label className="block mb-1 font-medium">Time Limit (minutes)</label>
+  <input
+    type="number"
+    min="1"
+    max="180"
+    className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-indigo-500"
+    value={timeLimit}
+    onChange={(e) => setTimeLimit(e.target.value)}
+    required
+  />
+</div>
+
 
           {/* Buttons */}
           <div className="flex justify-between pt-4">
