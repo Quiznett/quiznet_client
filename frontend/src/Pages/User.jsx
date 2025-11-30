@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: User.jsx
+// Purpose:
+//   - Serves as the main user dashboard after login.
+//   - Displays quiz statistics (quizzes created & quizzes attempted).
+//   - Provides quick actions: create a quiz or join a live quiz.
+//   - Loads basic dashboard data from the backend after authentication.
+//   - Includes sidebar navigation and create-quiz modal support.
+// -----------------------------------------------------------------------------
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import HeaderUser from "../components/HeaderUser";
@@ -45,10 +56,14 @@ export default function User() {
     loadData();
   }, [user]);
 
-  // Authentication & loading handling
-  if (loading) return <p>Loading...</p>;
-  if (!user) return <p>Please log in...</p>;
+  // Authentication state: show global loader while checking
+if (loading) return <GlobalLoader />;
 
+// Redirect to login if no user
+if (!user) {
+  navigate("/login", { replace: true });
+  return <GlobalLoader />;
+}
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       

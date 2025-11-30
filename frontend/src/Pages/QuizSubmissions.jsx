@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: QuizSubmissions.jsx
+// Purpose:
+//   - Allows quiz creators to view responses for quizzes that have already ended.
+//   - Fetches all ended quizzes created by the user and organizes them in an accordion.
+//   - Loads attempts per quiz when expanded (lazy loading).
+//   - Lets the creator open each participant’s response sheet in a modal.
+//   - Includes sidebar navigation and create-quiz modal support.
+// -----------------------------------------------------------------------------
+
+
 import { useEffect, useState } from "react";
 import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";

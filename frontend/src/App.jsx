@@ -1,3 +1,16 @@
+//Author: Nishtha Srivatava
+// -----------------------------------------------------------------------------
+// File: App.jsx
+// Purpose:
+//   - Defines all application routes using React Router.
+//   - Connects every page/component to its respective route.
+//   - Organizes routes into logical groups: public, authentication,
+//     dashboard, quiz flow (join → instructions → attempt → result),
+//     and creator/owner tools.
+//   - Serves as the main routing entry point of the frontend application.
+// -----------------------------------------------------------------------------
+
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LandingPage from "./Pages/LandingPage";
@@ -12,7 +25,7 @@ import Instructions from "./Pages/Instructions";
 import AttemptQuiz from "./Pages/AttemptQuiz";
 import Result from "./Pages/Result";
 
-import QuizAttempterList from "./Pages/QuizAttempterList";
+
 import AttemptedQuizzes from "./Pages/AttemptedQuizzes";
 import QuizSubmissions from "./Pages/QuizSubmissions";
 
@@ -61,7 +74,7 @@ export default function App() {
 
         {/* Creator Responses Section */}
         <Route path="/quiz-response" element={<QuizSubmissions />} />
-        <Route path="/quiz/:quizId/attempters" element={<QuizAttempterList />} />
+   
 
       </Routes>
     </BrowserRouter>

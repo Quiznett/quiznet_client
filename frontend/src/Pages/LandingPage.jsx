@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: LandingPage.jsx
+// Purpose:
+//   - Public homepage of the application (no login required).
+//   - Introduces the platform and highlights key features.
+//   - Provides a call-to-action button for users to get started (login/signup).
+//   - Displays feature sections like creating quizzes, attempting quizzes,
+//     and tracking results.
+// -----------------------------------------------------------------------------
+
+
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 

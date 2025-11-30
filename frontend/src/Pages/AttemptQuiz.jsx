@@ -1,3 +1,15 @@
+// -----------------------------------------------------------------------------
+// File: AttemptQuiz.jsx
+// Purpose:
+//   - Allows a user to attempt a quiz question-by-question.
+//   - Loads quiz data, saved responses, and server-synced timer.
+//   - Saves answers instantly (auto-save) as the user clicks options.
+//   - Auto-submits when time ends or quiz is force-ended.
+//   - Provides navigation between questions and manual final submission.
+// -----------------------------------------------------------------------------
+
+
+
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HeaderUser from "../components/HeaderUser";

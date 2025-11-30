@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: Login.jsx
+// Purpose:
+//   - Provides the login interface for users to authenticate.
+//   - Uses react-hook-form for client-side validation.
+//   - Sends login credentials to backend and handles success/error states.
+//   - Displays server-side errors (wrong password, inactive user, etc.).
+//   - Redirects authenticated users to their dashboard.
+// -----------------------------------------------------------------------------
+
+
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";

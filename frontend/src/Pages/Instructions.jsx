@@ -1,3 +1,16 @@
+// -----------------------------------------------------------------------------
+// File: Instructions.jsx
+// Purpose:
+//   - Shows quiz instructions and status before a user starts attempting a quiz.
+//   - Fetches quiz metadata (start time, end time, total questions, duration).
+//   - Handles multiple states: not started, active, ended, or already submitted.
+//   - Displays a countdown timer if the quiz hasn’t started yet.
+//   - Redirects users who have already submitted to the result page.
+//   - Allows user to begin the quiz after a final status validation.
+// -----------------------------------------------------------------------------
+
+
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HeaderUser from "../components/HeaderUser";

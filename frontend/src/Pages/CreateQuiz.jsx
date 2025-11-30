@@ -1,3 +1,16 @@
+// -----------------------------------------------------------------------------
+// File: CreateQuiz.jsx
+// Purpose:
+//   - Lets the quiz creator build a full quiz after entering metadata
+//     (title, date, time, time limit).
+//   - Allows adding, editing, and removing questions with 4 options each.
+//   - Allows selecting the correct option for every question.
+//   - Shows a live quiz preview on the right side.
+//   - Sends the final quiz to the backend and redirects to "My Quizzes" page.
+// -----------------------------------------------------------------------------
+
+
+
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";

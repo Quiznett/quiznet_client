@@ -1,4 +1,4 @@
-// MyQuizzes.jsx
+// myQuizzes.jsx
 // -----------------------------------------------------------------------------
 // This page displays all quizzes created by the logged-in user.
 // It loads quiz data from the backend, shows loading states, and provides

@@ -1,3 +1,6 @@
+//Author: Nishtha Srivatava
+
+
 // -----------------------------------------------------------------------------
 // Application Entry Point
 // -----------------------------------------------------------------------------
@@ -15,12 +18,12 @@ import { AuthProvider } from "./context/AuthContext";
 
 // Mount React app into the #root DOM element
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+ <>
     {/* Global providers for theme management and authentication */}
     <ThemeProvider>
       <AuthProvider>
         <App />
       </AuthProvider>
     </ThemeProvider>
-  </StrictMode>
+</>
 );

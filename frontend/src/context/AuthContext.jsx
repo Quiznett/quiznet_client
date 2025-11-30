@@ -1,3 +1,15 @@
+// -----------------------------------------------------------------------------
+// File: AuthContext.jsx
+// Purpose:
+//   - Manages global authentication state for the entire application.
+//   - Restores user session from cookies on page reload.
+//   - Provides login and logout functions that interact with backend APIs.
+//   - Stores authenticated user info and exposes it through React Context.
+//   - Ensures components can safely access user and loading states.
+// -----------------------------------------------------------------------------
+
+
+
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axiosInstance from "../api/axios";

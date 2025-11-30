@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// File: ThemeContext.jsx
+// Purpose:
+//   - Provides global theme state (light/dark mode) across the application.
+//   - Persists user theme preference in localStorage.
+//   - Toggles Tailwind's `dark` class on the <html> element to switch themes.
+//   - Exposes `darkMode` and `setDarkMode` through React Context for global use.
+// -----------------------------------------------------------------------------
+
+
+
 import { createContext, useContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext();

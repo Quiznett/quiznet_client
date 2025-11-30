@@ -1,3 +1,15 @@
+// -----------------------------------------------------------------------------
+// File: Register.jsx
+// Purpose:
+//   - Handles new user registration with OTP verification.
+//   - Sends OTP to the user's email and validates it before creating account.
+//   - Performs full registration (full name, username, email, password).
+//   - Shows both client-side and backend field-level validation errors.
+//   - Automatically logs the user in after successful registration.
+// -----------------------------------------------------------------------------
+
+
+
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Header from "../components/Header";

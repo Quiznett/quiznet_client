@@ -77,7 +77,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 /* Ensures consistent background + text color in both light & dark themes.    */
 /* -------------------------------------------------------------------------- */
 
-/* 🌙 Dark Mode autofill override */
+/*  Dark Mode autofill override */
 .dark input:-webkit-autofill,
 .dark input:-webkit-autofill:hover,
 .dark input:-webkit-autofill:focus {
@@ -86,7 +86,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border: 1px solid #4f46e5 !important;
 }
 
-/* ☀️ Light Mode autofill override */
+/*  Light Mode autofill override */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {

@@ -6,7 +6,7 @@ import axiosInstance from "../api/axios";
 // QuizCard Component
 // -----------------------------------------------------------------------------
 // Displays summary info for a single quiz (title, date, time, question count).
-// Provides actions: view details, get shareable link, delete quiz, edit quiz.
+// Provides actions: view details, get shareable link, delete quiz.
 // -----------------------------------------------------------------------------
 
 export default function QuizCard({ quiz, fetchQuizzes }) {

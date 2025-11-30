@@ -1,3 +1,12 @@
+// -----------------------------------------------------------------------------
+// File: AttemptedQuizzes.jsx
+// Purpose:
+//   - Displays all quizzes the logged-in user has attempted.
+//   - Shows submission status for each quiz.
+//   - Allows viewing of response sheets for submitted attempts.
+//   - Includes sidebar, header, and optional create-quiz modal.
+// -----------------------------------------------------------------------------
+
 import { useEffect, useState } from "react";
 import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";

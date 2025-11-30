@@ -1,3 +1,15 @@
+
+// -----------------------------------------------------------------------------
+// File: Result.jsx
+// Purpose:
+//   - Displays the final evaluated quiz result for the logged-in user.
+//   - Fetches the user's attempt data (supports both creator and participant logic).
+//   - Shows total score, correct/wrong/unanswered breakdown, and summary stats.
+//   - Provides an option to open a detailed answer sheet in a modal.
+//   - Includes sidebar navigation and create-quiz modal support.
+// -----------------------------------------------------------------------------
+
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HeaderUser from "../components/HeaderUser";
