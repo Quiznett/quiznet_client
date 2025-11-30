@@ -1,17 +1,21 @@
+/* -------------------------------------------------------------------------- */
+/* Tailwind Base Includes                                                     */
+/* -------------------------------------------------------------------------- */
 @import 'tailwindcss/base.css';
 @import 'tailwindcss/components.css';
 @import 'tailwindcss/utilities.css';
 
-/* Hide scrollbar for Chrome, Safari, Edge */
-::-webkit-scrollbar {
-  display: none;
-}
+/* -------------------------------------------------------------------------- */
+/* Custom Animations                                                          */
+/* -------------------------------------------------------------------------- */
 
+/* Smooth fade-in animation used across modals and UI elements */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
+/* Scale + fade animation for subtle UI transitions */
 @keyframes scaleIn {
   from { transform: scale(0.85); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
@@ -25,12 +29,16 @@
   animation: scaleIn 0.25s ease-out;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Date & Time Input Enhancements                                             */
+/* Ensures consistent calendar/time picker icons across browsers.             */
+/* -------------------------------------------------------------------------- */
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 1 !important;
-  pointer-events: auto !important; /* allow clicking */
-  width: 16px !important;          /* default icon size */
+  pointer-events: auto !important;      /* Allow clicking inside icon area */
+  width: 16px !important;
   height: 16px !important;
   position: absolute !important;
   right: 12px !important;
@@ -38,14 +46,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   transform: translateY(-50%) !important;
 }
 
-
+/* Provide room for the picker icon (Chrome/Safari/Edge) */
 input[type="date"],
 input[type="time"] {
   position: relative;
   padding-right: 40px !important;
 }
 
-
+/* Firefox Picker Fixes */
 input[type="date"]::-moz-focus-inner,
 input[type="time"]::-moz-focus-inner {
   border: 0;
@@ -57,8 +65,32 @@ input[type="time"]::-moz-calendar-picker-indicator {
   cursor: pointer;
 }
 
+/* Dark mode icon visibility (WebKit browsers) */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 1 !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Autofill Styles (Chrome/Edge/Safari)                                       */
+/* Ensures consistent background + text color in both light & dark themes.    */
+/* -------------------------------------------------------------------------- */
+
+/* 🌙 Dark Mode autofill override */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #0f172a inset !important;  /* Dark background */
+  -webkit-text-fill-color: #fff !important;             /* White text */
+  border: 1px solid #4f46e5 !important;
+}
+
+/* ☀️ Light Mode autofill override */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;  /* Light background */
+  -webkit-text-fill-color: #000 !important;             /* Black text */
+  border: 1px solid #4f46e5 !important;
 }

@@ -1,14 +1,29 @@
 import { useState } from "react";
 import axiosInstance from "../api/axios";
-import { useNavigate } from "react-router-dom";
+
+
+// -----------------------------------------------------------------------------
+// QuizCard Component
+// -----------------------------------------------------------------------------
+// Displays summary info for a single quiz (title, date, time, question count).
+// Provides actions: view details, get shareable link, delete quiz, edit quiz.
+// -----------------------------------------------------------------------------
 
 export default function QuizCard({ quiz, fetchQuizzes }) {
-  const navigate = useNavigate();
 
+
+  // Controls the visibility of the details section
   const [open, setOpen] = useState(false);
+
+  // Controls whether the shareable link is shown
   const [showLink, setShowLink] = useState(false);
+
+  // Stores generated quiz link
   const [generatedLink, setGeneratedLink] = useState("");
 
+  // -----------------------------------------------------------------------------
+  // Format a UTC datetime string into local date + time for display
+  // -----------------------------------------------------------------------------
   function formatLocalDateTime(utcString) {
     const date = new Date(utcString);
 
@@ -33,39 +48,43 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
 
   const totalQuestions = quiz.question_count || 0;
 
+  // -----------------------------------------------------------------------------
+  // Delete quiz → confirmation → remove quiz → refresh list
+  // -----------------------------------------------------------------------------
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this quiz?")) return;
 
     try {
       await axiosInstance.delete(`/api/v1/quiz/delete/${quiz.quiz_id}/`);
-      fetchQuizzes();
+      fetchQuizzes(); // refresh parent list
     } catch (err) {
       console.error("Delete error", err);
     }
   };
 
+  // -----------------------------------------------------------------------------
+  // Generate shareable quiz link and copy to clipboard
+  // -----------------------------------------------------------------------------
   const handlePublish = () => {
     const base = import.meta.env.VITE_FRONTEND_URL;
     const link = `${base}/attempt/${quiz.quiz_id}`;
 
     setGeneratedLink(link);
     setShowLink(true);
-
     navigator.clipboard.writeText(link);
-    alert(`Quiz link copied:\n${link}`);
   };
 
+  // Manual copy button for the visible link
   const copyLink = () => {
     navigator.clipboard.writeText(generatedLink);
     alert("Link copied!");
   };
 
-  const handleEdit = () => {
-    navigate(`/edit-quiz/${quiz.quiz_id}`, { state: quiz });
-  };
+ 
 
   return (
     <div className="p-5 bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition border dark:border-gray-700">
+      {/* Title + Details Toggle */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
           {quiz.quiz_title}
@@ -79,6 +98,7 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
         </button>
       </div>
 
+      {/* Quiz Details Section */}
       {open && (
         <div
           className="
@@ -89,27 +109,25 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
           "
         >
           <p>
-            <strong className="text-gray-900 dark:text-gray-200">Date:</strong>{" "}
-            {startDate}
+            <strong>Date:</strong> {startDate}
           </p>
 
           <p>
-            <strong className="text-gray-900 dark:text-gray-200">Time:</strong>{" "}
-            {startTime} - {endTime}
+            <strong>Time:</strong> {startTime} - {endTime}
           </p>
 
           <p>
-            <strong className="text-gray-900 dark:text-gray-200">
-              Total Questions:
-            </strong>{" "}
-            {totalQuestions}
+            <strong>Total Questions:</strong> {totalQuestions}
           </p>
         </div>
       )}
 
+      {/* Shareable Link Display */}
       {showLink && (
         <div className="mt-4">
-          <label className="block mb-1 font-medium text-green-500">Quiz Link</label>
+          <label className="block mb-1 font-medium text-green-500">
+            Quiz Link
+          </label>
 
           <div className="flex gap-2">
             <input
@@ -129,6 +147,7 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
         </div>
       )}
 
+      {/* Action Buttons */}
       <div className="flex items-center gap-3 mt-5">
         <button
           onClick={handleDelete}

@@ -1,22 +1,26 @@
-//Author: Nishtha
-//Date: 13/09/2025
-// Entry point of the React application. 
-// Responsible for rendering the root React component into the HTML DOM.
+// -----------------------------------------------------------------------------
+// Application Entry Point
+// -----------------------------------------------------------------------------
+// This file mounts the React application onto the DOM using React 18's `createRoot`.
+// It also wraps the app with global providers such as ThemeProvider and AuthProvider.
+// -----------------------------------------------------------------------------
 
-import { StrictMode } from 'react';                // Enables additional checks and warnings for development
-import { createRoot } from 'react-dom/client';    // React 18+ API to create root for rendering
-import './index.css';                              // Global styles
-import App from './App.jsx';                       // Main App component
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import "./index.css";                 // Global stylesheet
+import App from "./App.jsx";          // Root application component
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 
-// Create a React root and render the App component inside <StrictMode>
-createRoot(document.getElementById('root')).render(
+// Mount React app into the #root DOM element
+createRoot(document.getElementById("root")).render(
   <StrictMode>
+    {/* Global providers for theme management and authentication */}
     <ThemeProvider>
       <AuthProvider>
-      <App />
+        <App />
       </AuthProvider>
     </ThemeProvider>
-  </StrictMode>,
+  </StrictMode>
 );

@@ -10,10 +10,23 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+// -----------------------------------------------------------------------------
+// Sidebar Component
+// -----------------------------------------------------------------------------
+// Collapsible navigation sidebar used throughout authenticated pages.
+// Features:
+//   • Expands/collapses with animation
+//   • Highlights active route
+//   • Supports "Create Quiz" action without routing
+//   • Responsive icons-only mode when collapsed
+// -----------------------------------------------------------------------------
+
 export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // List of sidebar navigation items
+  // Each entry may trigger navigation OR trigger an action
   const navItems = [
     { label: "Home", icon: Home, path: "/user" },
     { label: "Create a Quiz", icon: PlusSquare, action: "openForm" },
@@ -25,11 +38,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
 
   return (
     <aside
-      className={`transition-all ${
-        sidebarOpen ? "w-56" : "w-16"
-      } duration-300 bg-white dark:bg-gray-800 shadow-md flex flex-col justify-between`}
+      className={`
+        transition-all duration-300 shadow-md flex flex-col justify-between
+        bg-white dark:bg-gray-800
+        ${sidebarOpen ? "w-56" : "w-24"}
+      `}
     >
       <div className="grow flex flex-col">
+        
+        {/* Collapse / Expand Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 m-2 w-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md flex items-center justify-center"
@@ -37,10 +54,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
           {sidebarOpen ? <X size={25} /> : <Menu size={25} />}
         </button>
 
+        {/* Navigation Menu */}
         <nav
-          className={`grow flex flex-col gap-2 p-2 text-gray-700 dark:text-gray-200 overflow-hidden ${
-            !sidebarOpen && "py-0"
-          }`}
+          className={`
+            grow flex flex-col gap-2 p-2 text-gray-700 dark:text-gray-200
+            overflow-hidden ${!sidebarOpen && "py-0"}
+          `}
         >
           {navItems.map((item, index) => {
             const Icon = item.icon;
@@ -51,23 +70,29 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
                 key={index}
                 onClick={() => {
                   if (item.action === "openForm") {
-                    openCreateForm();         
+                    openCreateForm(); // trigger modal from parent
                   } else {
                     navigate(item.path);
                   }
                 }}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-all
+                className={`
+                  flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-all
                   ${
                     isActive && sidebarOpen
                       ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-semibold"
                       : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
+                  }
+                `}
               >
+                {/* Icon Always Visible */}
                 <Icon size={22} />
+
+                {/* Text Fades In/Out When Sidebar Collapses */}
                 <span
-                  className={`transition-all duration-300 ${
-                    sidebarOpen ? "opacity-100" : "opacity-0"
-                  } text-base`}
+                  className={`
+                    overflow-hidden whitespace-nowrap transition-all duration-300
+                    ${sidebarOpen ? "opacity-100 w-auto ml-2" : "opacity-0 w-0"}
+                  `}
                 >
                   {item.label}
                 </span>

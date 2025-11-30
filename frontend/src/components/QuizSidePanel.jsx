@@ -1,5 +1,15 @@
 import React from "react";
 
+// -----------------------------------------------------------------------------
+// QuizSidePanel Component
+// -----------------------------------------------------------------------------
+// Displays a side navigation panel showing numbered buttons for each question.
+// Highlights:
+//   • Current question
+//   • Answered questions
+// Allows jumping directly to any question.
+// -----------------------------------------------------------------------------
+
 export default function QuizSidePanel({
   questions,
   responses,
@@ -12,10 +22,11 @@ export default function QuizSidePanel({
         Questions
       </h2>
 
+      {/* Question index grid */}
       <div className="grid grid-cols-4 gap-3">
         {questions.map((q, index) => {
-          const isAnswered = !!responses[q.question_id];
-          const isCurrent = index === currentIndex;
+          const isAnswered = !!responses[q.question_id]; // shows green state
+          const isCurrent = index === currentIndex; // shows blue state
 
           return (
             <button

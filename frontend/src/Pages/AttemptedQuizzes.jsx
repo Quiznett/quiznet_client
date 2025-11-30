@@ -3,68 +3,106 @@ import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../api/axios";
-import AttemptedResponseSheet from "../components/AttemptedResponseSheet";
+import ResponseSheet from "../components/ResponseSheet";
 import CreateQuizForm from "../components/CreateQuizForm";
 import { Loader2 } from "lucide-react";
+import GlobalLoader from "../components/GloblaLoader";
 
 export default function AttemptedQuizzes() {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Current logged-in user info
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [attemptedQuizzes, setAttemptedQuizzes] = useState([]);
-  const [loading, setLoading] = useState(false);   // ⬅ FIXED (was true)
+  const [loading, setLoading] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
 
   useEffect(() => {
+    // Fetch all quizzes the user has attempted (or created)
     const load = async () => {
       try {
-        setLoading(true);  
+        setLoading(true);
 
-        const quizRes = await axiosInstance.get("/api/v1/quiz/quizzes/attempted/");
-        const quizzes = quizRes.data;
-
+        // Get list of quizzes related to this user
+        const quizRes = await axiosInstance.get(
+          "/api/v1/quiz/quizzes/attempted/"
+        );
+        const quizzes = quizRes?.data || [];
         const results = [];
 
         for (const quiz of quizzes) {
           try {
+            // Fetch the user’s response for each quiz
             const attemptRes = await axiosInstance.get(
               `/api/v1/quiz/quizzes/${quiz.quiz_id}/responses/`
             );
-            results.push({ quiz, attempt: attemptRes.data, submitted: true });
-          } catch (error) {
-            const status = error.response?.status;
-            const detail = error.response?.data?.detail;
+            const data = attemptRes?.data;
 
-            if (status === 400 && detail === "Attempt not submitted yet") {
+            // Creator case: backend returns array of attempts
+            if (Array.isArray(data)) {
+              const ownAttempt = data.find(
+                (resp) => String(resp.user_id) === String(user?.id)
+              );
+
+              if (!ownAttempt) {
+                results.push({
+                  quiz,
+                  attempt: null,
+                  submitted: false,
+                });
+                continue;
+              }
+
+              results.push({
+                quiz,
+                attempt: ownAttempt,
+                submitted: true,
+              });
+              continue;
+            }
+
+            // Normal user case: backend returns single attempt object
+            results.push({ quiz, attempt: data, submitted: true });
+          } catch (error) {
+            // Handle quizzes with no submitted attempt
+            const detail = error?.response?.data?.detail;
+
+            if (detail === "Attempt not submitted yet") {
               results.push({ quiz, attempt: null, submitted: false });
             } else {
+              // Any other backend failure is handled gracefully in UI
               results.push({
                 quiz,
                 attempt: null,
                 submitted: false,
-                message: detail || "No response",
+                message: detail || "No response available",
               });
             }
           }
         }
 
         setAttemptedQuizzes(results);
-      } catch (err) {
-        console.error("Error loading attempted quizzes:", err);
+      } catch  {
+        // No console logging in production — silently fail
+        // Page still shows safe UI fallbacks
       } finally {
-        setLoading(false);   // ⬅ End loader
+        setLoading(false);
       }
     };
 
     load();
-  }, []);
+  }, [user?.id]);
+
+  // Show global loader during first-time load
+  if (loading) return <GlobalLoader />;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <HeaderUser username={user.username} fullname={user.fullname} />
+      {/* Top header with user info */}
+      <HeaderUser username={user?.username} fullname={user?.fullname} />
 
       <main className="relative flex flex-grow">
+        {/* App sidebar navigation */}
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
@@ -76,16 +114,18 @@ export default function AttemptedQuizzes() {
             Attempted Quizzes
           </h1>
 
-          {/* ⬇ Loader INSIDE content area */}
+          {/* Local content loader */}
           {loading ? (
             <div className="flex justify-center py-20">
               <Loader2 className="animate-spin" size={40} />
             </div>
           ) : attemptedQuizzes.length === 0 ? (
+            // If user has not attempted any quiz yet
             <p className="text-gray-500 dark:text-gray-300">
               You haven’t attempted any quizzes yet.
             </p>
           ) : (
+            // Render list of quizzes and attempt status
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {attemptedQuizzes.map(({ quiz, attempt, submitted }) => (
                 <div
@@ -97,10 +137,14 @@ export default function AttemptedQuizzes() {
                   </h2>
 
                   <p className="text-gray-500 dark:text-gray-300 mt-1">
-                    Held on: {new Date(quiz.ends_on).toLocaleString()}
+                    Held on:{" "}
+                    {quiz?.ends_on
+                      ? new Date(quiz.ends_on).toLocaleString()
+                      : "N/A"}
                   </p>
 
                   {submitted ? (
+                    // User has submitted attempt
                     <button
                       onClick={() => setSelectedAttempt({ quiz, attempt })}
                       className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -108,6 +152,7 @@ export default function AttemptedQuizzes() {
                       View Response Sheet →
                     </button>
                   ) : (
+                    // User did not submit
                     <button
                       disabled
                       className="mt-4 px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed"
@@ -122,13 +167,15 @@ export default function AttemptedQuizzes() {
         </section>
       </main>
 
+      {/* Attempt response modal */}
       {selectedAttempt && (
-        <AttemptedResponseSheet
-          attempt={selectedAttempt}
+        <ResponseSheet
+          attempt={selectedAttempt.attempt}
           onClose={() => setSelectedAttempt(null)}
         />
       )}
 
+      {/* Create quiz modal */}
       {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
     </div>
   );

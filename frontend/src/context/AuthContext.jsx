@@ -1,90 +1,73 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import axiosInstance from "../api/axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const u = localStorage.getItem("user");
-    return u ? JSON.parse(u) : null;
-  });
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);     // Stores authenticated user info
+  const [loading, setLoading] = useState(true); // Indicates auth state is being resolved
 
-  const [loading, setLoading] = useState(true);
-
+  // -----------------------------------------------------------------------------
+  // Restore user session on page reload
+  // Reads the "user" cookie (non-HttpOnly) which the backend sets after login.
+  // -----------------------------------------------------------------------------
   useEffect(() => {
-    const init = async () => {
+    const userCookie = Cookies.get("user");
+
+    if (userCookie) {
       try {
-        const res = await axios.post(
-          `${API_URL}/api/v1/auth/refresh/`,
-          {},
-          { withCredentials: true }
-        );
-
-        const access = res.data.access;
-        if (access) localStorage.setItem("access", access);
-
-        
-        const userCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("user="));
-
-        if (userCookie) {
-          const value = decodeURIComponent(userCookie.split("=")[1]);
-          const parsedUser = JSON.parse(value);
-
-          localStorage.setItem("user", JSON.stringify(parsedUser));
-          setUser(parsedUser);
-        }
+        const parsed = JSON.parse(decodeURIComponent(userCookie));
+        setUser(parsed);
       } catch {
-        localStorage.removeItem("access");
-        localStorage.removeItem("user");
-        setUser(null);
-      } finally {
-        setLoading(false);
+        // Minimal production logging
+        console.error("Failed to parse user cookie");
       }
-    };
+    }
 
-    init();
+    setLoading(false);
   }, []);
 
-  // LOGIN
+  // -----------------------------------------------------------------------------
+  // Login handler
+  // Calls backend login endpoint → backend sets cookies → store user in context.
+  // -----------------------------------------------------------------------------
   const login = async (credentials) => {
-    const res = await axios.post(
-      `${API_URL}/api/v1/auth/login/`,
-      credentials,
-      { withCredentials: true }
-    );
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        "/api/v1/auth/login/",
+        credentials
+      );
 
-    const access = res.data.access;
-    if (access) localStorage.setItem("access", access);
+      // Backend returns user data and sets cookies automatically
+      setUser(response.data.user);
 
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    setUser(res.data.user);
-
-    return res;
+      return response;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // LOGOUT
+  // -----------------------------------------------------------------------------
+  // Logout handler
+  // Clears user session both server-side and client-side.
+  // -----------------------------------------------------------------------------
   const logout = async () => {
-    await axios.post(
-      `${API_URL}/api/v1/auth/logout/`,
-      {},
-      { withCredentials: true }
-    );
-
-    localStorage.removeItem("access");
-    localStorage.removeItem("user");
-    setUser(null);
+    try {
+      await axiosInstance.post("/api/v1/auth/logout/");
+    } finally {
+      Cookies.remove("user");
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

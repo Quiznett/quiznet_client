@@ -13,47 +13,57 @@ import AttemptQuiz from "./Pages/AttemptQuiz";
 import Result from "./Pages/Result";
 
 import QuizAttempterList from "./Pages/QuizAttempterList";
- import AttemptedQuizzes from "./Pages/AttemptedQuizzes";
-import QuizSubmissions from "./Pages/QuizSubmissions";  
-
-
-
-
-
-
-
+import AttemptedQuizzes from "./Pages/AttemptedQuizzes";
+import QuizSubmissions from "./Pages/QuizSubmissions";
 
 import "./index.css";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
+      {/* 
+        -------------------------------------------------------------------------
+        Application Routes
+        -------------------------------------------------------------------------
+        Each route maps to a top-level page of the application.
+        Pages are grouped logically:
+        - Public routes
+        - Authentication
+        - Dashboard
+        - Quiz Flow (join → instructions → attempt → result)
+        - Creator-specific views
+        -------------------------------------------------------------------------
+      */}
       <Routes>
+
+        {/* Public */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/Register" element={<Register />} />
-        <Route path="/Login" element={<Login />} />
+
+        {/* Authentication */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* User Dashboard */}
         <Route path="/user" element={<User />} />
+
+        {/* Quiz Creation */}
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/myQuizzes" element={<MyQuizzes />} />
+
+        {/* Join & Attempt Flow */}
         <Route path="/join-quiz" element={<JoinQuiz />} />
-        
         <Route path="/instructions/:quizId" element={<Instructions />} />
-
         <Route path="/attempt/:quizId" element={<AttemptQuiz />} />
-     
-       <Route path="/quiz-response" element={<QuizSubmissions />} />
-<Route path="/quiz/:quizId/attempters" element={<QuizAttempterList />} />
         <Route path="/result/:quizId" element={<Result />} />
-<Route path="/given-quizzes" element={<AttemptedQuizzes />} />
 
+        {/* Attempts & History */}
+        <Route path="/given-quizzes" element={<AttemptedQuizzes />} />
 
-          
+        {/* Creator Responses Section */}
+        <Route path="/quiz-response" element={<QuizSubmissions />} />
+        <Route path="/quiz/:quizId/attempters" element={<QuizAttempterList />} />
 
-
-       
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

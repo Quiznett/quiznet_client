@@ -3,10 +3,19 @@ import { createContext, useContext, useState, useEffect } from "react";
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
+  // -----------------------------------------------------------------------------
+  // Persisted theme state
+  // Reads initial mode from localStorage to preserve user preference
+  // across page reloads.
+  // -----------------------------------------------------------------------------
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
   );
 
+  // -----------------------------------------------------------------------------
+  // Apply theme changes to the <html> element and store preference
+  // Tailwind's dark mode is class-based, so we toggle the "dark" class.
+  // -----------------------------------------------------------------------------
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("darkMode", darkMode);
@@ -19,6 +28,8 @@ export function ThemeProvider({ children }) {
   );
 }
 
+// Hook to access theme values anywhere in the app
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   return useContext(ThemeContext);
 }

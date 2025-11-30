@@ -10,50 +10,64 @@ export default function User() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
+  // Sidebar + modal toggles
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openForm, setOpenForm] = useState(false);
 
-  const [createdCount, setCreatedCount] = useState(0);
-  const [attemptedCount, setAttemptedCount] = useState(0);
+  // Dashboard statistics
+  const [createdCount, setCreatedCount] = useState(0);    // Total quizzes created by user
+  const [attemptedCount, setAttemptedCount] = useState(0); // Total quizzes attempted by user
 
+  // -----------------------------------------------------------------------------
+  // Load basic dashboard statistics (created quizzes & attempted quizzes)
+  // Runs only after user state is resolved.
+  // -----------------------------------------------------------------------------
   useEffect(() => {
     if (!user) return;
 
     const loadData = async () => {
       try {
-        // Total quizzes CREATED
+        // Fetch quizzes CREATED by the user
         const createdRes = await axiosInstance.get("/api/v1/quiz/create/");
         setCreatedCount(createdRes.data.length);
 
-        // Total quizzes ATTEMPTED
+        // Fetch quizzes ATTEMPTED by the user
         const attemptedRes = await axiosInstance.get(
           "/api/v1/quiz/quizzes/attempted/"
         );
         setAttemptedCount(attemptedRes.data.length);
-      } catch (err) {
-        console.error("Dashboard Load Error:", err);
+      } catch {
+        // Silent production logging
+        console.error("Dashboard Load Error");
       }
     };
 
     loadData();
   }, [user]);
 
+  // Authentication & loading handling
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please log in...</p>;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      
+      {/* Top user info header */}
       <HeaderUser username={user.username} fullname={user.fullname} />
 
       <main className="relative flex flex-grow">
+
+        {/* Sidebar navigation */}
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           openCreateForm={() => setOpenForm(true)}
         />
 
+        {/* Dashboard Content */}
         <section className="flex-grow p-8 overflow-auto">
-          {/* Stats Section */}
+
+          {/* User stats summary */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="p-6 bg-blue-500 text-white rounded-xl shadow-md">
               <p className="text-lg font-semibold">Quizzes Attempted</p>
@@ -68,7 +82,8 @@ export default function User() {
 
           {/* Action Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Create Quiz */}
+
+            {/* Create Quiz Card */}
             <div
               onClick={() => setOpenForm(true)}
               className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl cursor-pointer text-center transition"
@@ -84,7 +99,7 @@ export default function User() {
               </button>
             </div>
 
-            {/* Join Quiz */}
+            {/* Join Quiz Card */}
             <div
               onClick={() => navigate("/join-quiz")}
               className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl cursor-pointer text-center transition"
@@ -99,9 +114,12 @@ export default function User() {
                 Join Now
               </button>
             </div>
+
           </div>
 
+          {/* Create Quiz Modal */}
           {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+
         </section>
       </main>
     </div>
