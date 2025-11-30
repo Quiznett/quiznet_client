@@ -4,7 +4,10 @@ import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../api/axios";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import ResponsePopup from "../components/AttemptResponseModal";
+import ResponseSheet from "../components/ResponseSheet";
+import CreateQuizForm from "../components/CreateQuizForm";
+import GlobalLoader from "../components/GloblaLoader";
+
 
 export default function QuizSubmissions() {
   const { user } = useAuth();
@@ -12,6 +15,7 @@ export default function QuizSubmissions() {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openQuizId, setOpenQuizId] = useState(null);
+  const [openForm, setOpenForm] = useState(false);
   const [attempts, setAttempts] = useState({});
   const [selectedAttempt, setSelectedAttempt] = useState(null);
 
@@ -48,12 +52,8 @@ export default function QuizSubmissions() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center p-10">
-        <Loader2 className="animate-spin" size={40} />
-      </div>
-    );
+if (loading) return <GlobalLoader />;
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -63,6 +63,7 @@ export default function QuizSubmissions() {
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
+          openCreateForm={() => setOpenForm(true)}
         />
 
         <section className="flex-grow p-8 overflow-auto">
@@ -131,12 +132,16 @@ export default function QuizSubmissions() {
         </section>
       </main>
 
-      {selectedAttempt && (
-        <ResponsePopup
-          attempt={selectedAttempt}
-          onClose={() => setSelectedAttempt(null)}
-        />
-      )}
+    {selectedAttempt && (
+  <ResponseSheet
+    attempt={selectedAttempt}
+    onClose={() => setSelectedAttempt(null)}
+  />
+  
+)}
+{/* Create Quiz Form Modal */}
+      {openForm && <CreateQuizForm closeForm={() => setOpenForm(false)} />}
+
     </div>
   );
 }

@@ -9,9 +9,40 @@ export default function CreateQuizForm({ closeForm }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [timeLimit, setTimeLimit] = useState("");
+  const [timeError, setTimeError] = useState("");
+const [limitError, setLimitError] = useState("");
+
 
 
   const modalRef = useRef(null);
+  useEffect(() => {
+  if (!date || !startTime || !endTime) return;
+
+  const start = new Date(`${date}T${startTime}`);
+  const end = new Date(`${date}T${endTime}`);
+
+  // Reset
+  setTimeError("");
+  setLimitError("");
+
+  // Validate end > start
+  if (end <= start) {
+    setTimeError("End time must be AFTER start time.");
+    return;
+  }
+
+  // Validate time limit
+  if (timeLimit) {
+    const availableMinutes = (end - start) / (1000 * 60);
+
+    if (Number(timeLimit) > availableMinutes) {
+      setLimitError(
+        `Time limit cannot exceed available time (${availableMinutes} minutes).`
+      );
+    }
+  }
+}, [date, startTime, endTime, timeLimit]);
+
 
   
   useEffect(() => {
@@ -24,32 +55,25 @@ export default function CreateQuizForm({ closeForm }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [closeForm]);
 
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const start = new Date(`${date}T${startTime}`);
-  const end = new Date(`${date}T${endTime}`);
+  if (timeError || limitError) return; // block form submit
 
-  if (end <= start) {
-    alert("End time must be AFTER start time.");
-    return; 
-  }
+  closeForm();
+
+  navigate("/create-quiz", {
+    state: {
+      quizTitle,
+      date,
+      startTime,
+      endTime,
+      timeLimit,
+    },
+  });
+};
 
 
-    
-    closeForm();
-
-  
-    navigate("/create-quiz", {
-      state: {
-        quizTitle,
-        date,
-        startTime,
-        endTime,
-         timeLimit,
-      },
-    });
-  };
 
   return (
     <div
@@ -104,17 +128,21 @@ export default function CreateQuizForm({ closeForm }) {
             />
           </div>
 
-          <div>
-            <label className="block mb-1 font-medium">End Time</label>
-            <input
-              type="time"
-              className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-indigo-500"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required
-            />
-          </div>
-          <div>
+      <div>
+  <label className="block mb-1 font-medium">End Time</label>
+  <input
+    type="time"
+    className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-indigo-500"
+    value={endTime}
+    onChange={(e) => setEndTime(e.target.value)}
+    required
+  />
+  {timeError && (
+    <p className="text-red-500 text-sm mt-1">{timeError}</p>
+  )}
+</div>
+
+     <div>
   <label className="block mb-1 font-medium">Time Limit (minutes)</label>
   <input
     type="number"
@@ -125,7 +153,11 @@ export default function CreateQuizForm({ closeForm }) {
     onChange={(e) => setTimeLimit(e.target.value)}
     required
   />
+  {limitError && (
+    <p className="text-red-500 text-sm mt-1">{limitError}</p>
+  )}
 </div>
+
 
 
           {/* Buttons */}

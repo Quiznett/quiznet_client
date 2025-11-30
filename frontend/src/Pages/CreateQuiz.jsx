@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
 
@@ -6,13 +6,13 @@ import HeaderUser from "../components/HeaderUser";
 import { useAuth } from "../context/AuthContext";
 
 import axiosInstance from "../api/axios";
-
+import GlobalLoader from "../components/GloblaLoader";
 export default function CreateQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
 
 
-  const { user } = useAuth();
+  const { user,loading } = useAuth();
 
   
 
@@ -60,6 +60,16 @@ export default function CreateQuiz() {
 
   // CREATE QUIZ API CALL
   const handleSaveQuiz = async () => {
+  const firstQ = questions[0];
+
+  const isEmptyQuestion =
+    !firstQ.question.trim() &&
+    firstQ.options.every(opt => !opt.trim());
+
+  if (isEmptyQuestion) {
+    alert("Please add at least one complete question before saving the quiz.");
+    return;
+  }
     try {
       const start = new Date(`${date}T${startTime}:00`);
       const end = new Date(`${date}T${endTime}:00`);
@@ -94,6 +104,7 @@ export default function CreateQuiz() {
       alert("Failed to create quiz.");
     }
   };
+  if (loading) return <GlobalLoader />;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-200">

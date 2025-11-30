@@ -3,25 +3,28 @@ import HeaderUser from "../components/HeaderUser";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../api/axios";
-import AttemptedResponseSheet from "../components/AttemptedResponseSheet";
+import ResponseSheet from "../components/ResponseSheet";
 import CreateQuizForm from "../components/CreateQuizForm";
 import { Loader2 } from "lucide-react";
+import GlobalLoader from "../components/GloblaLoader";
 
 export default function AttemptedQuizzes() {
   const { user } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [attemptedQuizzes, setAttemptedQuizzes] = useState([]);
-  const [loading, setLoading] = useState(false);   // ⬅ FIXED (was true)
+  const [loading, setLoading] = useState(false); // ⬅ FIXED (was true)
   const [openForm, setOpenForm] = useState(false);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);  
+        setLoading(true);
 
-        const quizRes = await axiosInstance.get("/api/v1/quiz/quizzes/attempted/");
+        const quizRes = await axiosInstance.get(
+          "/api/v1/quiz/quizzes/attempted/"
+        );
         const quizzes = quizRes.data;
 
         const results = [];
@@ -31,12 +34,39 @@ export default function AttemptedQuizzes() {
             const attemptRes = await axiosInstance.get(
               `/api/v1/quiz/quizzes/${quiz.quiz_id}/responses/`
             );
-            results.push({ quiz, attempt: attemptRes.data, submitted: true });
+
+            let data = attemptRes.data;
+
+            // CREATOR CASE → backend returns array
+            if (Array.isArray(data)) {
+              const ownAttempt = data.find(
+                (resp) => String(resp.user_id) === String(user.id)
+              );
+
+              if (!ownAttempt) {
+                results.push({
+                  quiz,
+                  attempt: null,
+                  submitted: false,
+                });
+                continue;
+              }
+
+              results.push({
+                quiz,
+                attempt: ownAttempt,
+                submitted: true,
+              });
+
+              continue;
+            }
+
+            // NORMAL USER CASE → backend returns single object
+            results.push({ quiz, attempt: data, submitted: true });
           } catch (error) {
-            const status = error.response?.status;
             const detail = error.response?.data?.detail;
 
-            if (status === 400 && detail === "Attempt not submitted yet") {
+            if (detail === "Attempt not submitted yet") {
               results.push({ quiz, attempt: null, submitted: false });
             } else {
               results.push({
@@ -53,13 +83,13 @@ export default function AttemptedQuizzes() {
       } catch (err) {
         console.error("Error loading attempted quizzes:", err);
       } finally {
-        setLoading(false);   // ⬅ End loader
+        setLoading(false); // ⬅ End loader
       }
     };
 
     load();
   }, []);
-
+if (loading) return <GlobalLoader />;
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <HeaderUser username={user.username} fullname={user.fullname} />
@@ -123,8 +153,8 @@ export default function AttemptedQuizzes() {
       </main>
 
       {selectedAttempt && (
-        <AttemptedResponseSheet
-          attempt={selectedAttempt}
+        <ResponseSheet
+          attempt={selectedAttempt.attempt}
           onClose={() => setSelectedAttempt(null)}
         />
       )}

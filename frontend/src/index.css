@@ -2,10 +2,10 @@
 @import 'tailwindcss/components.css';
 @import 'tailwindcss/utilities.css';
 
-/* Hide scrollbar for Chrome, Safari, Edge */
+/* Hide scrollbar for Chrome, Safari, Edge
 ::-webkit-scrollbar {
   display: none;
-}
+} */
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -62,3 +62,21 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 1 !important;
 }
+/* 🌙 DARK MODE autofill fix */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #0f172a inset !important; /* dark input bg */
+  -webkit-text-fill-color: #fff !important;
+  border: 1px solid #4f46e5 !important;
+}
+
+/* ☀️ LIGHT MODE autofill fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #ffffff inset !important; /* light bg */
+  -webkit-text-fill-color: #000 !important;
+  border: 1px solid #4f46e5 !important;
+}
+

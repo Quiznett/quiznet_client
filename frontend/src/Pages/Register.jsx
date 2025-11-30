@@ -3,14 +3,16 @@ import { useForm } from "react-hook-form";
 import Header from "../components/Header";
 import { useState } from "react";
 import InputField from "../components/InputField";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import axiosInstance from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();   // <-- for auto-login after register
+
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const {
     register,
@@ -22,30 +24,34 @@ export default function Register() {
   const onSubmit = async (data) => {
     setLoading(true);
     setServerError(null);
+    setFieldErrors({});
 
     try {
-      const res = await axios.post(
-        `${API_URL}/api/v1/auth/register/`,
-        {
-          username: data.username,
-          email: data.email,
-          password: data.password,
-         fullname: data.fullName,
+      // 1️⃣ Register user
+      await axiosInstance.post("/api/v1/auth/register/", {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        fullname: data.fullName,
+      });
 
-        },
-        { withCredentials: true }
-      );
+      // 2️⃣ Auto login user
+      await login({
+        username: data.username,
+        password: data.password,
+      });
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
+      // 3️⃣ Redirect to /user page
       navigate("/user");
+
     } catch (err) {
-      setServerError(
-        err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Registration failed."
-      );
+      const d = err.response?.data;
+
+      if (typeof d === "object" && d !== null) {
+        setFieldErrors(d);
+      }
+
+      setServerError(d?.message || d?.error || "Registration failed.");
     } finally {
       setLoading(false);
     }
@@ -53,7 +59,6 @@ export default function Register() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-indigo-50 via-white to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-
       <Header />
 
       <main className="flex-grow flex items-center justify-center px-6 py-12">
@@ -75,14 +80,16 @@ export default function Register() {
               register={register("fullName", {
                 required: "Full name is required",
               })}
-              error={errors.fullName?.message}
+              error={errors.fullName?.message || fieldErrors.fullname?.[0]}
             />
 
             <InputField
               label="Username"
               type="text"
-              register={register("username", { required: "Username is required" })}
-              error={errors.username?.message}
+              register={register("username", {
+                required: "Username is required",
+              })}
+              error={errors.username?.message || fieldErrors.username?.[0]}
             />
 
             <InputField
@@ -95,7 +102,7 @@ export default function Register() {
                   message: "Invalid email",
                 },
               })}
-              error={errors.email?.message}
+              error={errors.email?.message || fieldErrors.email?.[0]}
             />
 
             <InputField
@@ -105,7 +112,7 @@ export default function Register() {
                 required: "Password is required",
                 minLength: { value: 6, message: "At least 6 characters" },
               })}
-              error={errors.password?.message}
+              error={errors.password?.message || fieldErrors.password?.[0]}
             />
 
             <InputField
@@ -134,7 +141,10 @@ export default function Register() {
 
           <p className="mt-6 text-center text-gray-600 dark:text-gray-300">
             Already have an account?{" "}
-            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-medium">
+            <Link
+              to="/login"
+              className="text-indigo-600 dark:text-indigo-400 font-medium"
+            >
               Login
             </Link>
           </p>

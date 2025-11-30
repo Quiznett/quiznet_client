@@ -8,8 +8,10 @@ import { useState } from "react";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+
   const [serverError, setServerError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({}); // ✅ NEW
 
   const {
     register,
@@ -20,6 +22,7 @@ export default function Login() {
   const onSubmit = async (data) => {
     setLoading(true);
     setServerError(null);
+    setFieldErrors({}); // clear previous field errors
 
     try {
       await login({
@@ -29,7 +32,19 @@ export default function Login() {
 
       navigate("/user");
     } catch (err) {
-      setServerError(err.response?.data?.error || "Login failed.");
+      const res = err.response?.data;
+
+      // Field-level errors sent by backend (e.g. missing username)
+      if (typeof res === "object" && res !== null) {
+        setFieldErrors(res);
+      }
+
+      // Generic login error
+      setServerError(
+        res?.message ||
+        res?.error ||
+        "Login failed."
+      );
     } finally {
       setLoading(false);
     }
@@ -51,18 +66,25 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+            {/* Username */}
             <InputField
               label="Username"
               type="text"
-              register={register("username", { required: "Username is required" })}
-              error={errors.username?.message}
+              register={register("username", {
+                required: "Username is required",
+              })}
+              error={errors.username?.message || fieldErrors.username?.[0]}
             />
 
+            {/* Password */}
             <InputField
               label="Password"
               type="password"
-              register={register("password", { required: "Password is required" })}
-              error={errors.password?.message}
+              register={register("password", {
+                required: "Password is required",
+              })}
+              error={errors.password?.message || fieldErrors.password?.[0]}
             />
 
             <button

@@ -1,90 +1,54 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import axiosInstance from "../api/axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const u = localStorage.getItem("user");
-    return u ? JSON.parse(u) : null;
-  });
-
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Load user from readable cookie on refresh
   useEffect(() => {
-    const init = async () => {
+    const userCookie = Cookies.get("user"); // NOT HttpOnly, readable
+    
+    if (userCookie) {
       try {
-        const res = await axios.post(
-          `${API_URL}/api/v1/auth/refresh/`,
-          {},
-          { withCredentials: true }
-        );
-
-        const access = res.data.access;
-        if (access) localStorage.setItem("access", access);
-
-        
-        const userCookie = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("user="));
-
-        if (userCookie) {
-          const value = decodeURIComponent(userCookie.split("=")[1]);
-          const parsedUser = JSON.parse(value);
-
-          localStorage.setItem("user", JSON.stringify(parsedUser));
-          setUser(parsedUser);
-        }
-      } catch {
-        localStorage.removeItem("access");
-        localStorage.removeItem("user");
-        setUser(null);
-      } finally {
-        setLoading(false);
+        const decoded = JSON.parse(decodeURIComponent(userCookie));
+        setUser(decoded);
+      } catch (err) {
+        console.error("Cookie parse error:", err);
       }
-    };
+    }
 
-    init();
+    setLoading(false);
   }, []);
 
-  // LOGIN
   const login = async (credentials) => {
-    const res = await axios.post(
-      `${API_URL}/api/v1/auth/login/`,
-      credentials,
-      { withCredentials: true }
-    );
+    setLoading(true);
+    try {
+      const res = await axiosInstance.post("/api/v1/auth/login/", credentials);
 
-    const access = res.data.access;
-    if (access) localStorage.setItem("access", access);
+      // backend already sets cookies, including user cookie
+      setUser(res.data.user);
 
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    setUser(res.data.user);
-
-    return res;
+      return res;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // LOGOUT
   const logout = async () => {
-    await axios.post(
-      `${API_URL}/api/v1/auth/logout/`,
-      {},
-      { withCredentials: true }
-    );
-
-    localStorage.removeItem("access");
-    localStorage.removeItem("user");
+    await axiosInstance.post("/api/v1/auth/logout/");
+    Cookies.remove("user");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => useContext(AuthContext);

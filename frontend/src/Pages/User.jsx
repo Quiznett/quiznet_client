@@ -40,6 +40,7 @@ export default function User() {
 
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please log in...</p>;
+  if (loading) return <GlobalLoader />;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">

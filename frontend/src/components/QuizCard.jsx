@@ -52,7 +52,7 @@ export default function QuizCard({ quiz, fetchQuizzes }) {
     setShowLink(true);
 
     navigator.clipboard.writeText(link);
-    alert(`Quiz link copied:\n${link}`);
+    // alert(`Quiz link copied:\n${link}`);
   };
 
   const copyLink = () => {

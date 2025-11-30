@@ -26,7 +26,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
   return (
     <aside
       className={`transition-all ${
-        sidebarOpen ? "w-56" : "w-16"
+        sidebarOpen ? "w-56" : "w-24"
       } duration-300 bg-white dark:bg-gray-800 shadow-md flex flex-col justify-between`}
     >
       <div className="grow flex flex-col">
@@ -64,13 +64,16 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, openCreateForm })
                   }`}
               >
                 <Icon size={22} />
-                <span
-                  className={`transition-all duration-300 ${
-                    sidebarOpen ? "opacity-100" : "opacity-0"
-                  } text-base`}
-                >
-                  {item.label}
-                </span>
+ <span
+  className={`
+    overflow-hidden whitespace-nowrap transition-all duration-300
+    ${sidebarOpen ? "opacity-100 w-auto ml-2" : "opacity-0 w-0"}
+  `}
+>
+  {item.label}
+</span>
+
+
               </div>
             );
           })}

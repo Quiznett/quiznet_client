@@ -8,7 +8,7 @@ export default function LandingPage(){
         <main className="flex-grow flex flex-col items-center text-center px-6 py-12">
             <h2 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">Ready to Quiz?</h2>
             <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-8">Sign up, create your first quiz, Attempt quizzes, and see your results!</p>
-            <Link to="/Register"className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 transition">Getting Started</Link>
+            <Link to="/login"className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold text-lg shadow-lg hover:bg-indigo-700 transition">Getting Started</Link>
             {/*feature 1 */}
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
                  <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:scale-105 transition" >
