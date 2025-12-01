@@ -1,26 +1,21 @@
 // -----------------------------------------------------------------------------
 // axios.js — Centralized Axios Instance
-// -----------------------------------------------------------------------------
-// This file configures a single Axios instance used across the application.
-// It ensures consistent base URL, credentials handling (cookies), and headers.
-//
-// Environment variable:
-//    VITE_API_URL → Backend API base URL
+// Purpose:
+//   - Sends requests to backend with credentials (sessionid + csrf cookies).
+//   - localStorage  stores only user info (NOT tokens).
 // -----------------------------------------------------------------------------
 
 import axios from "axios";
 
-// Backend API root URL (loaded from environment variables)
+// Backend API root URL (environment variable)
 export const API_URL = import.meta.env.VITE_API_URL;
 
-// Create a preconfigured Axios instance
 const axiosInstance = axios.create({
-  baseURL: API_URL,                         // All requests start from this base URL
-  withCredentials: true,                    // Enables sending cookies (session/CSRF)
+  baseURL: API_URL,
+  withCredentials: true,                
   headers: {
-    "Content-Type": "application/json",     // Default content type
+    "Content-Type": "application/json",
   },
 });
 
-// Export for use in API calls
 export default axiosInstance;

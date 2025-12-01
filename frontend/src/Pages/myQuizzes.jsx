@@ -63,14 +63,6 @@ export default function MyQuizzes() {
       </div>
     );
 
-  // User not logged in (extra safety)
-  if (!user)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Please log in...</p>
-      </div>
-    );
-
   // Full-screen loader while quizzes are being fetched
   if (loading) return <GlobalLoader />;
 

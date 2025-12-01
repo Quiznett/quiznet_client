@@ -8,7 +8,7 @@
 // It also wraps the app with global providers such as ThemeProvider and AuthProvider.
 // -----------------------------------------------------------------------------
 
-import { StrictMode } from "react";
+
 import { createRoot } from "react-dom/client";
 
 import "./index.css";                 // Global stylesheet

@@ -16,7 +16,7 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import CreateQuizForm from "../components/CreateQuizForm";
 import axiosInstance from "../api/axios";
-
+import GlobalLoader from "../components/GloblaLoader";
 export default function User() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();

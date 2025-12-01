@@ -2,38 +2,32 @@
 // File: AuthContext.jsx
 // Purpose:
 //   - Manages global authentication state for the entire application.
-//   - Restores user session from cookies on page reload.
-//   - Provides login and logout functions that interact with backend APIs.
-//   - Stores authenticated user info and exposes it through React Context.
-//   - Ensures components can safely access user and loading states.
+//   - Restores user session from localStorage on page reload.
+//   - Stores authenticated user info in localStorage instead of cookies.
+//   - Uses Django sessionid (HttpOnly) for actual authentication security.
 // -----------------------------------------------------------------------------
 
-
-
 import { createContext, useContext, useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import axiosInstance from "../api/axios";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);     // Stores authenticated user info
-  const [loading, setLoading] = useState(true); // Indicates auth state is being resolved
+  const [user, setUser] = useState(null);       // Authenticated user info
+  const [loading, setLoading] = useState(true); // Resolving stored session
 
   // -----------------------------------------------------------------------------
-  // Restore user session on page reload
-  // Reads the "user" cookie (non-HttpOnly) which the backend sets after login.
+  // Restore user session on page reload (from localStorage)
   // -----------------------------------------------------------------------------
   useEffect(() => {
-    const userCookie = Cookies.get("user");
+    const storedUser = localStorage.getItem("user");
 
-    if (userCookie) {
+    if (storedUser) {
       try {
-        const parsed = JSON.parse(decodeURIComponent(userCookie));
-        setUser(parsed);
-      } catch {
-        // Minimal production logging
-        console.error("Failed to parse user cookie");
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Failed to parse stored user");
+        localStorage.removeItem("user");
       }
     }
 
@@ -41,8 +35,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   // -----------------------------------------------------------------------------
-  // Login handler
-  // Calls backend login endpoint → backend sets cookies → store user in context.
+  // Login handler (store user info to localStorage)
   // -----------------------------------------------------------------------------
   const login = async (credentials) => {
     setLoading(true);
@@ -52,8 +45,11 @@ export function AuthProvider({ children }) {
         credentials
       );
 
-      // Backend returns user data and sets cookies automatically
-      setUser(response.data.user);
+      const userData = response.data.user;
+
+      // Store user
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
 
       return response;
     } finally {
@@ -62,14 +58,13 @@ export function AuthProvider({ children }) {
   };
 
   // -----------------------------------------------------------------------------
-  // Logout handler
-  // Clears user session both server-side and client-side.
+  // Logout handler (clears localStorage + invalidates server session)
   // -----------------------------------------------------------------------------
   const logout = async () => {
     try {
       await axiosInstance.post("/api/v1/auth/logout/");
     } finally {
-      Cookies.remove("user");
+      localStorage.removeItem("user");
       setUser(null);
     }
   };
